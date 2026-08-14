@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<title>OpenFC — Flight Controller Visualizer</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+  :root{ --cyan:#00A7E1; --ok:#37e0a0; --ink:#eaf4fb; --dim:#9fc0d6; }
+  *{box-sizing:border-box}
+  html,body{margin:0;height:100%;overflow:hidden;background:#0b1622;
+    font-family:Inter,system-ui,sans-serif;color:var(--ink);-webkit-user-select:none;user-select:none;}
+  #viewport{width:100%;height:100%;position:relative}
+  canvas{display:block;touch-action:none}
+
+  /* UI identique à la version validée */
+  #top{position:fixed;top:0;left:0;right:0;z-index:5;padding:14px 18px;background:linear-gradient(180deg,#0b1622f2,#0b162200);pointer-events:none}
+  #topInner{display:flex;align-items:center;gap:14px;max-width:1180px;margin:0 auto}
+  #logo{flex:none;width:44px;height:44px;border-radius:12px;background:var(--cyan);color:#04222f;display:grid;place-items:center;font-size:22px;box-shadow:0 6px 18px #00a7e155}
+  #ttl{flex:1;min-width:0}
+  #prog{flex:none;text-align:right;font-size:12px;color:var(--dim)}
+  #bar{max-width:1180px;margin:11px auto 0;height:6px;border-radius:4px;background:#16304a;overflow:hidden}
+  #barFill{height:100%;width:0;border-radius:4px;background:linear-gradient(90deg,var(--cyan),var(--ok));transition:width .5s}
+
+  #card{position:fixed;left:18px;bottom:18px;z-index:6;width:400px;background:#0e2236f6;border-left:4px solid var(--cyan);padding:20px;border-radius:18px;box-shadow:0 10px 30px #000;max-height:80vh;overflow-y:auto}
+  #card h3{margin:0;font-size:1.2rem}
+  #card p{font-size:0.9rem;color:var(--dim);line-height:1.5}
+  
+  #ctl{position:fixed;right:18px;bottom:18px;z-index:6;display:flex;gap:9px;align-items:center}
+  .btn{border:1px solid #244863;background:#102a40e6;color:var(--ink);border-radius:11px;padding:12px 16px;font:800 13.5px Inter;cursor:pointer}
+  .btn.pri{background:linear-gradient(180deg,#0d84b8,#0a6d99);color:#fff}
+  .sm{padding:10px 12px;font-size:13px}
+</style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script type="importmap">{ "imports": { "three": "https://unpkg.com/three@0.163.0/build/three.module.js", "three/addons/": "https://unpkg.com/three@0.163.0/examples/jsm/" } }</script>
+</head>
+<body>
+  <div id="top"><div id="topInner">
+    <div id="logo">🚀</div>
+    <div id="ttl"><b>OpenFC Build</b><span>Contrôleur de vol Open-Source</span></div>
+    <div id="prog"><b id="pCount">1/8</b><br><span>étapes</span></div>
+  </div><div id="bar"><div id="barFill"></div></div></div>
+
+  <div id="viewBtns" style="position:fixed;top:80px;right:18px;z-index:6;display:flex;gap:6px">
+    <label class="btn sm"><input type="checkbox" id="chkSpin"> Auto-spin</label>
+    <button class="btn sm" id="btnFlip">🔄 Flip</button>
+  </div>
+
+  <div id="card">
+    <h3 id="cTitle">Chargement...</h3>
+    <div id="cWhat" style="color:var(--cyan); font-weight:bold; margin-bottom:5px"></div>
+    <p id="cBlurb"></p>
+    <div id="cRefs" style="font-family:monospace; font-size:0.7rem; color:#6f96b1; margin-top:10px"></div>
+  </div>
+
+  <div id="viewport"></div>
+
+  <div id="ctl">
+    <button class="btn sm" id="btnReframe">🎯 Reset</button>
+    <button class="btn" id="btnBack" disabled>← Back</button>
+    <button class="btn pri" id="btnNext">Next →</button>
+  </div>
+
+<script type="module">
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+import { MeshoptDecoder } from 'three/addons/libs/meshopt_decoder.module.js';
+
+// IMPORTANT : Assure-toi que ce dossier existe sur ton GitHub
+const ASSETS = './assets/openfc-visualizer'; 
+
+const STEPS = [
+  {title:'The Heart', what:'MCU (RP2354B)', refs:['MCU'], blurb:'Installation du microcontrôleur principal.'},
+  {title:'The Gyro', what:'IMU (BMI270)', refs:['IMU'], blurb:'Installation de l\'unité de mesure inertielle.'},
+  {title:'Video/OSD', what:'OSD Chip', refs:['OSD'], blurb:'Circuit d\'incrustation vidéo.'},
+  {title:'Blackbox', what:'MicroSD Slot', refs:['SD_SLOT'], blurb:'Port carte SD pour les logs.'},
+  {title:'Power', what:'Buck & LDO', refs:['BUCK', 'LDO'], blurb:'Gestion de l\'alimentation 5V/3.3V.'},
+  {title:'Radio', what:'ExpressLRS', refs:['ELRS'], blurb:'Module radio intégré.'},
+  {title:'Input/Output', what:'USB-C & Pads', refs:['USBC', 'PADS'], blurb:'Connectique et alimentation.'},
+  {title:'Final Assembly', what:'Ready to fly', refs:[], blurb:'Assemblage terminé.'}
+];
+
+const renderer = new THREE.WebGLRenderer({ antialias:true });
+renderer.setSize(innerWidth, innerHeight);
+document.getElementById('viewport').appendChild(renderer.domElement);
+
+const scene = new THREE.Scene(); scene.background = new THREE.Color(0x0b1622);
+const camera = new THREE.PerspectiveCamera(40, innerWidth/innerHeight, 0.01, 50);
+const controls = new OrbitControls(camera, renderer.domElement);
+controls.enableDamping = true;
+
+// Lumière attachée à la caméra
+scene.add(camera);
+const light = new THREE.DirectionalLight(0xffffff, 1.5);
+light.position.set(0, 0, 1);
+camera.add(light);
+
+const ROOT = new THREE.Group(); scene.add(ROOT);
+let partsRoot = null;
+const nodes = new Map();
+let stepIndex = 0, flipped = false;
+
+async function load() {
+  const loader = new GLTFLoader().setMeshoptDecoder(MeshoptDecoder);
+  try {
+    const [bRes, pRes] = await Promise.all([
+      loader.loadAsync(`${ASSETS}/fc-board.glb`),
+      loader.loadAsync(`${ASSETS}/fc-parts.glb`)
+    ]);
+    ROOT.add(bRes.scene);
+    partsRoot = pRes.scene;
+    ROOT.add(partsRoot);
+    
+    // DEBUG : Liste tous les noms trouvés dans la console
+    partsRoot.traverse(o => { 
+        if(o.name) { 
+            nodes.set(o.name, o); 
+            o.visible = false; 
+            console.log("Nom de pièce trouvé : " + o.name); 
+        } 
+    });
+    
+    showStep(0);
+  } catch(e) { console.error(e); }
+}
+
+function showStep(idx) {
+  stepIndex = idx;
+  const s = STEPS[idx];
+  document.getElementById('pCount').textContent = `${idx + 1}/8`;
+  document.getElementById('barFill').style.width = `${((idx+1)/8)*100}%`;
+  document.getElementById('cTitle').textContent = s.title;
+  document.getElementById('cWhat').textContent = s.what;
+  document.getElementById('cBlurb').textContent = s.blurb;
+  
+  // Logique cumulative
+  if (idx === 7) nodes.forEach(n => n.visible = true);
+  else {
+    nodes.forEach(n => n.visible = false);
+    for(let i=0; i<=idx; i++) {
+        if(STEPS[i].refs) {
+            STEPS[i].refs().forEach(r => {
+                if(nodes.has(r)) nodes.get(r).visible = true;
+            });
+        }
+    }
+  }
+  document.getElementById('btnBack').disabled = (idx === 0);
+  document.getElementById('btnNext').textContent = (idx === 7) ? 'Finish 🏆' : 'Next →';
+}
+
+document.getElementById('btnNext').onclick = () => { if(stepIndex < 7) showStep(++stepIndex); else location.reload(); };
+document.getElementById('btnBack').onclick = () => { if(stepIndex > 0) showStep(--stepIndex); };
+document.getElementById('btnFlip').onclick = () => { flipped = !flipped; gsap.to(ROOT.rotation, {x: flipped ? Math.PI : 0, duration: 1}); };
+document.getElementById('chkSpin').onchange = (e) => controls.autoRotate = e.target.checked;
+document.getElementById('btnReframe').onclick = () => { camera.position.set(0, 0.2, 0.3); controls.target.set(0,0,0); };
+
+load();
+function animate() { requestAnimationFrame(animate); controls.update(); renderer.render(scene, camera); }
+animate();
+</script>
+</body>
+</html>
