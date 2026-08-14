@@ -1,157 +1,210 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-<title>OpenFC — Flight Controller Visualizer</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet">
-<style>
-  :root{ --cyan:#00A7E1; --ok:#37e0a0; --ink:#eaf4fb; --dim:#9fc0d6; }
-  *{box-sizing:border-box}
-  html,body{margin:0;height:100%;overflow:hidden;background:#0b1622;font-family:Inter,system-ui,sans-serif;color:var(--ink);-webkit-user-select:none;user-select:none;}
-  #viewport{width:100%;height:100%;position:relative}
-  canvas{display:block;touch-action:none}
-  #top{position:fixed;top:0;left:0;right:0;z-index:5;padding:14px 18px;background:linear-gradient(180deg,#0b1622f2,#0b162200);pointer-events:none}
-  #topInner{display:flex;align-items:center;gap:14px;max-width:1180px;margin:0 auto}
-  #logo{flex:none;width:44px;height:44px;border-radius:12px;background:var(--cyan);color:#04222f;display:grid;place-items:center;font-size:22px;box-shadow:0 6px 18px #00a7e155}
-  #ttl{flex:1;min-width:0}
-  #prog{flex:none;text-align:right;font-size:12px;color:var(--dim)}
-  #bar{max-width:1180px;margin:11px auto 0;height:6px;border-radius:4px;background:#16304a;overflow:hidden}
-  #barFill{height:100%;width:0;border-radius:4px;background:linear-gradient(90deg,var(--cyan),var(--ok));transition:width .5s}
-  #card{position:fixed;left:18px;bottom:18px;z-index:6;width:400px;background:#0e2236f6;border-left:4px solid var(--cyan);padding:20px;border-radius:18px;box-shadow:0 10px 30px #000;max-height:80vh;overflow-y:auto}
-  #card h3{margin:0;font-size:1.2rem}
-  #card p{font-size:0.9rem;color:var(--dim);line-height:1.5}
-  #ctl{position:fixed;right:18px;bottom:18px;z-index:6;display:flex;gap:9px;align-items:center}
-  .btn{border:1px solid #244863;background:#102a40e6;color:var(--ink);border-radius:11px;padding:12px 16px;font:800 13.5px Inter;cursor:pointer}
-  .btn.pri{background:linear-gradient(180deg,#0d84b8,#0a6d99);color:#fff}
-  .sm{padding:10px 12px;font-size:13px}
-</style>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
-<script type="importmap">{ "imports": { "three": "https://unpkg.com/three@0.163.0/build/three.module.js", "three/addons/": "https://unpkg.com/three@0.163.0/examples/jsm/" } }</script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Visualiseur OpenFC 3D</title>
+    <!-- Tailwind CSS pour un design moderne et rapide -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body, html { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background: #0f172a; color: #f8fafc; font-family: ui-sans-serif, system-ui, sans-serif; }
+        #webgl-container { width: 100%; height: 100%; position: absolute; top: 0; left: 0; z-index: 1; }
+        #ui-overlay { position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); z-index: 10; width: 90%; max-width: 600px; background: rgba(15, 23, 42, 0.85); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 1rem; padding: 1.25rem; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5); }
+    </style>
 </head>
 <body>
-  <div id="top"><div id="topInner">
-    <div id="logo">🚀</div>
-    <div id="ttl"><b>OpenFC Build</b><span>Contrôleur de vol Open-Source</span></div>
-    <div id="prog"><b id="pCount">1/8</b><br><span>étapes</span></div>
-  </div><div id="bar"><div id="barFill"></div></div></div>
-  <div id="viewBtns" style="position:fixed;top:80px;right:18px;z-index:6;display:flex;gap:6px">
-    <label class="btn sm"><input type="checkbox" id="chkSpin"> Auto-spin</label>
-    <button class="btn sm" id="btnFlip">🔄 Flip</button>
-  </div>
-  <div id="card">
-    <h3 id="cTitle">Chargement...</h3>
-    <div id="cWhat" style="color:var(--cyan); font-weight:bold; margin-bottom:5px"></div>
-    <p id="cBlurb"></p>
-    <div id="cRefs" style="font-family:monospace; font-size:0.7rem; color:#6f96b1; margin-top:10px"></div>
-  </div>
-  <div id="viewport"></div>
-  <div id="ctl">
-    <button class="btn sm" id="btnReframe">🎯 Reset</button>
-    <button class="btn" id="btnBack" disabled>← Back</button>
-    <button class="btn pri" id="btnNext">Next →</button>
-  </div>
-<script type="module">
-import * as THREE from 'three';
-import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
-import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
-import { MeshoptDecoder } from 'three/addons/libs/meshopt_decoder.module.js';
 
-const ASSETS = './assets/openfc-visualizer'; 
-const STEPS = [
-  {title:'The Heart', what:'MCU (RP2354B)', refs:['MCU'], blurb:'Installation du microcontrôleur principal.'},
-  {title:'The Gyro', what:'IMU (BMI270)', refs:['IMU'], blurb:'Installation de l\'unité de mesure inertielle.'},
-  {title:'Video/OSD', what:'OSD Chip', refs:['OSD'], blurb:'Circuit d\'incrustation vidéo.'},
-  {title:'Blackbox', what:'MicroSD Slot', refs:['SD_SLOT'], blurb:'Port carte SD pour les logs.'},
-  {title:'Power', what:'Buck & LDO', refs:['BUCK', 'LDO'], blurb:'Gestion de l\'alimentation 5V/3.3V.'},
-  {title:'Radio', what:'ExpressLRS', refs:['ELRS'], blurb:'Module radio intégré.'},
-  {title:'Input/Output', what:'USB-C & Pads', refs:['USBC', 'PADS'], blurb:'Connectique et alimentation.'},
-  {title:'Final Assembly', what:'Ready to fly', refs:[], blurb:'Assemblage terminé.'}
-];
+    <!-- Conteneur 3D Three.js -->
+    <div id="webgl-container"></div>
 
-const renderer = new THREE.WebGLRenderer({ antialias:true });
-renderer.setSize(innerWidth, innerHeight);
-document.getElementById('viewport').appendChild(renderer.domElement);
+    <!-- Interface utilisateur (UI) -->
+    <div id="ui-overlay">
+        <!-- Barre de progression -->
+        <div class="flex justify-between items-center mb-2 text-xs font-semibold text-slate-400">
+            <span id="cTitle" class="text-indigo-400 uppercase tracking-wider">Chargement...</span>
+            <span id="pCount">1/8</span>
+        </div>
+        <div class="w-full bg-slate-800 h-1.5 rounded-full mb-4 overflow-hidden">
+            <div id="barFill" class="bg-indigo-500 h-full transition-all duration-300 rounded-full" style="width: 0%;"></div>
+        </div>
 
-const scene = new THREE.Scene(); 
-scene.background = new THREE.Color(0x0b1622);
-const camera = new THREE.PerspectiveCamera(40, innerWidth/innerHeight, 0.01, 50);
-const controls = new OrbitControls(camera, renderer.domElement);
-controls.enableDamping = true;
+        <!-- Informations de l'étape -->
+        <div class="mb-4">
+            <h2 id="cWhat" class="text-lg font-bold text-slate-100">Initialisation de la scène</h2>
+            <p id="cBlurb" class="text-sm text-slate-400 mt-1">Veuillez patienter pendant le chargement des modèles 3D...</p>
+        </div>
 
-scene.add(camera);
-const light = new THREE.DirectionalLight(0xffffff, 1.5);
-light.position.set(0, 0, 1);
-camera.add(light);
+        <!-- Boutons de navigation -->
+        <div class="flex justify-between items-center pt-2 border-t border-slate-800">
+            <button id="btnBack" disabled class="px-4 py-2 bg-slate-800 hover:bg-slate-700 disabled:opacity-40 disabled:cursor-not-allowed text-sm font-medium rounded-lg transition">← Précédent</button>
+            <button id="btnNext" class="px-5 py-2 bg-indigo-600 hover:bg-indigo-500 text-sm font-semibold rounded-lg transition shadow-lg shadow-indigo-600/30">Suivant →</button>
+        </div>
+    </div>
 
-const ROOT = new THREE.Group(); 
-scene.add(ROOT);
-let partsRoot = null;
-const nodes = new Map();
-let stepIndex = 0, flipped = false;
-
-async function load() {
-  const loader = new GLTFLoader().setMeshoptDecoder(MeshoptDecoder);
-  try {
-    const [bRes, pRes] = await Promise.all([
-      loader.loadAsync(`${ASSETS}/fc-board.glb`),
-      loader.loadAsync(`${ASSETS}/fc-parts.glb`)
-    ]);
-    ROOT.add(bRes.scene);
-    partsRoot = pRes.scene;
-    ROOT.add(partsRoot);
-        
-    partsRoot.traverse(o => { 
-         if(o.name) { 
-             nodes.set(o.name, o); 
-             o.visible = false; 
-             console.log("Nom de pièce trouvé : " + o.name); 
-         } 
-     });
-        
-    showStep(0);
-  } catch(e) { console.error(e); }
-}
-
-function showStep(idx) {
-  stepIndex = idx;
-  const s = STEPS[idx];
-  document.getElementById('pCount').textContent = `${idx + 1}/8`;
-  document.getElementById('barFill').style.width = `${((idx+1)/8)*100}%`;
-  document.getElementById('cTitle').textContent = s.title;
-  document.getElementById('cWhat').textContent = s.what;
-  document.getElementById('cBlurb').textContent = s.blurb;
-    
-  if (idx === 7) {
-    nodes.forEach(n => n.visible = true);
-  } else {
-    nodes.forEach(n => n.visible = false);
-    for(let i=0; i<=idx; i++) {
-        if(STEPS[i].refs) {
-            STEPS[i].refs.forEach(r => {
-                if(nodes.has(r)) nodes.get(r).visible = true;
-            });
+    <!-- Import Map pour charger Three.js et ses addons via ES Modules -->
+    <script type="importmap">
+      {
+        "imports": {
+          "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+          "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
         }
-    }
-  }
-  document.getElementById('btnBack').disabled = (idx === 0);
-  document.getElementById('btnNext').textContent = (idx === 7) ? 'Finish 🏆' : 'Next →';
-}
+      }
+    </script>
 
-document.getElementById('btnNext').onclick = () => { if(stepIndex < 7) showStep(++stepIndex); else location.reload(); };
-document.getElementById('btnBack').onclick = () => { if(stepIndex > 0) showStep(--stepIndex); };
-document.getElementById('btnFlip').onclick = () => { flipped = !flipped; gsap.to(ROOT.rotation, {x: flipped ? Math.PI : 0, duration: 1}); };
-document.getElementById('chkSpin').onchange = (e) => controls.autoRotate = e.target.checked;
-document.getElementById('btnReframe').onclick = () => { camera.position.set(0, 0.2, 0.3); controls.target.set(0,0,0); };
+    <!-- Script Logique 3D & UI -->
+    <script type="module">
+        import * as THREE from 'three';
+        import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+        import { MeshoptDecoder } from 'three/addons/libs/meshopt_decoder.module.js';
+        import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
-load();
+        // Configuration de la scène, de la caméra et du renderer
+        const container = document.getElementById('webgl-container');
+        const SCENE = new THREE.Scene();
+        
+        const CAMERA = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
+        CAMERA.position.set(0, 50, 60);
 
-function animate() { 
-  requestAnimationFrame(animate); 
-  controls.update(); 
-  renderer.render(scene, camera); 
-}
-animate();
-</script>
+        const RENDERER = new THREE.WebGLRenderer({ antialias: true });
+        RENDERER.setSize(window.innerWidth, window.innerHeight);
+        RENDERER.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        RENDERER.outputColorSpace = THREE.SRGBColorSpace;
+        container.appendChild(RENDERER.domElement);
+
+        const CONTROLS = new OrbitControls(CAMERA, RENDERER.domElement);
+        CONTROLS.enableDamping = true;
+
+        // Éclairage de la scène
+        const ambientLight = new THREE.AmbientLight(0xffffff, 1.2);
+        SCENE.add(ambientLight);
+
+        const dirLight = new THREE.DirectionalLight(0xffffff, 2.0);
+        dirLight.position.set(20, 40, 20);
+        SCENE.add(dirLight);
+
+        const dirLight2 = new THREE.DirectionalLight(0x90b0ff, 1.0);
+        dirLight2.position.set(-20, -20, -20);
+        SCENE.add(dirLight2);
+
+        const ROOT = new THREE.Group();
+        SCENE.add(ROOT);
+
+        let partsRoot = null;
+        let stepIndex = 0;
+        const allParts = [];
+        const ASSETS = './assets'; // Dossier contenant vos fichiers fc-board.glb et fc-parts.glb
+
+        // Définition des étapes d'assemblage
+        const STEPS = [
+          { title: "MCU", what: "Microcontrôleur principal", blurb: "Installation du processeur central.", refs: ["U1"] },
+          { title: "IMU", what: "Unité de mesure inertielle", blurb: "Capteurs gyroscopes et accéléromètres.", refs: ["U2"] },
+          { title: "OSD", what: "On-Screen Display", blurb: "Puce d'affichage vidéo incrustée.", refs: ["U3"] },
+          { title: "Power", what: "Gestion d'alimentation", blurb: "Régulateurs de tension et filtrage.", refs: ["U4", "C1"] },
+          { title: "Comms", what: "Récepteur / Télémétrie", blurb: "Modules de communication sans fil.", refs: ["U5"] },
+          { title: "Connectors", what: "Connecteurs & Pads", blurb: "Soudure des ports externes.", refs: ["J1", "J2"] },
+          { title: "Passives", what: "Composants passifs", blurb: "Résistances et condensateurs de découplage.", refs: ["R1", "R2"] },
+          { title: "Final", what: "Assemblage complet", blurb: "Vérification finale de la carte.", refs: [] }
+        ];
+
+        // Chargement des modèles GLTF
+        async function load() {
+          const loader = new GLTFLoader().setMeshoptDecoder(MeshoptDecoder);
+          try {
+            const [bRes, pRes] = await Promise.all([
+              loader.loadAsync(`${ASSETS}/fc-board.glb`),
+              loader.loadAsync(`${ASSETS}/fc-parts.glb`)
+            ]);
+            
+            ROOT.add(bRes.scene);
+            partsRoot = pRes.scene;
+            ROOT.add(partsRoot);
+                
+            let meshIndex = 0;
+            partsRoot.traverse(o => { 
+               if (o.isMesh) {
+                   allParts.push(o);
+                   o.visible = false;
+                   console.log(`Mesh [${meshIndex}] trouvé -> Nom : ${o.name}`);
+                   meshIndex++;
+               }
+            });
+             
+            showStep(0);
+          } catch(e) { 
+            console.error("Erreur lors du chargement des modèles GLTF :", e);
+            document.getElementById('cWhat').textContent = "Erreur de chargement";
+            document.getElementById('cBlurb').textContent = "Vérifiez que le dossier 'assets' et les fichiers .glb sont bien présents.";
+          }
+        }
+
+        // Fonction de rendu des étapes
+        function showStep(idx) {
+          stepIndex = idx;
+          const s = STEPS[idx];
+          
+          const pCount = document.getElementById('pCount');
+          const barFill = document.getElementById('barFill');
+          const cTitle = document.getElementById('cTitle');
+          const cWhat = document.getElementById('cWhat');
+          const cBlurb = document.getElementById('cBlurb');
+          const btnBack = document.getElementById('btnBack');
+          const btnNext = document.getElementById('btnNext');
+
+          if (pCount) pCount.textContent = `${idx + 1}/${STEPS.length}`;
+          if (barFill) barFill.style.width = `${((idx + 1) / STEPS.length) * 100}%`;
+          if (cTitle) cTitle.textContent = s.title;
+          if (cWhat) cWhat.textContent = s.what;
+          if (cBlurb) cBlurb.textContent = s.blurb;
+            
+          if (idx === STEPS.length - 1) {
+            allParts.forEach(p => p.visible = true);
+          } else {
+            allParts.forEach(p => p.visible = false);
+            
+            for (let i = 0; i <= idx; i++) {
+                if (STEPS[i].refs) {
+                    STEPS[i].refs.forEach(ref => {
+                        const node = partsRoot.getObjectByName(ref);
+                        if (node) {
+                            node.traverse(child => { if (child.isMesh) child.visible = true; });
+                        }
+                    });
+                }
+            }
+          }
+          
+          if (btnBack) btnBack.disabled = (idx === 0);
+          if (btnNext) btnNext.textContent = (idx === STEPS.length - 1) ? 'Terminé 🏆' : 'Suivant →';
+        }
+
+        // Écouteurs d'événements des boutons
+        document.getElementById('btnBack').addEventListener('click', () => {
+          if (stepIndex > 0) showStep(stepIndex - 1);
+        });
+
+        document.getElementById('btnNext').addEventListener('click', () => {
+          if (stepIndex < STEPS.length - 1) {
+            showStep(stepIndex + 1);
+          }
+        });
+
+        // Redimensionnement de la fenêtre
+        window.addEventListener('resize', () => {
+          CAMERA.aspect = window.innerWidth / window.innerHeight;
+          CAMERA.updateProjectionMatrix();
+          RENDERER.setSize(window.innerWidth, window.innerHeight);
+        });
+
+        // Boucle d'animation (Render Loop)
+        function animate() {
+          requestAnimationFrame(animate);
+          CONTROLS.update();
+          RENDERER.render(SCENE, CAMERA);
+        }
+        animate();
+
+        // Lancement de l'application
+        load();
+    </script>
 </body>
 </html>
