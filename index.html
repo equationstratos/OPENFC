@@ -59,14 +59,14 @@ import { MeshoptDecoder } from 'three/addons/libs/meshopt_decoder.module.js';
 
 const ASSETS = './assets/openfc-visualizer'; 
 const STEPS = [
-  {title:'The Heart', what:'MCU (RP2354B)', refs:['MCU'], blurb:'Installation du microcontrôleur principal.'},
-  {title:'The Gyro', what:'IMU (BMI270)', refs:['IMU'], blurb:'Installation de l\'unité de mesure inertielle.'},
-  {title:'Video/OSD', what:'OSD Chip', refs:['OSD'], blurb:'Circuit d\'incrustation vidéo.'},
-  {title:'Blackbox', what:'MicroSD Slot', refs:['SD_SLOT'], blurb:'Port carte SD pour les logs.'},
-  {title:'Power', what:'Buck & LDO', refs:['BUCK', 'LDO'], blurb:'Gestion de l\'alimentation 5V/3.3V.'},
-  {title:'Radio', what:'ExpressLRS', refs:['ELRS'], blurb:'Module radio intégré.'},
-  {title:'Input/Output', what:'USB-C & Pads', refs:['USBC', 'PADS'], blurb:'Connectique et alimentation.'},
-  {title:'Final Assembly', what:'Ready to fly', refs:[], blurb:'Assemblage terminé.'}
+  {title:'The Heart', what:'MCU (RP2354B)', blurb:'Installation du microcontrôleur principal.'},
+  {title:'The Gyro', what:'IMU (BMI270)', blurb:'Installation de l\'unité de mesure inertielle.'},
+  {title:'Video/OSD', what:'OSD Chip', blurb:'Circuit d\'incrustation vidéo.'},
+  {title:'Blackbox', what:'MicroSD Slot', blurb:'Port carte SD pour les logs.'},
+  {title:'Power', what:'Buck & LDO', blurb:'Gestion de l\'alimentation 5V/3.3V.'},
+  {title:'Radio', what:'ExpressLRS', blurb:'Module radio intégré.'},
+  {title:'Input/Output', what:'USB-C & Pads', blurb:'Connectique et alimentation.'},
+  {title:'Final Assembly', what:'Ready to fly', blurb:'Assemblage terminé.'}
 ];
 
 const renderer = new THREE.WebGLRenderer({ antialias:true });
@@ -89,7 +89,7 @@ scene.add(camera);
 const ROOT = new THREE.Group(); 
 scene.add(ROOT);
 let partsRoot = null;
-const nodes = new Map();
+let allMeshes = [];
 let stepIndex = 0, flipped = false;
 
 async function load() {
@@ -104,25 +104,19 @@ async function load() {
     partsRoot = pRes.scene;
     ROOT.add(partsRoot);
         
-    // Enregistrement des meshes réels (en excluant les 'empty')
+    // Collecter toutes les mailles (meshes) physiques du modèle
+    allMeshes = [];
     partsRoot.traverse(o => {
-      if (o.isMesh && o.name && !o.name.toLowerCase().startsWith('empty')) {
-        console.log(`Pièce 3D valide enregistrée : ${o.name}`);
-        nodes.set(o.name, o);
+      if (o.isMesh) {
+        allMeshes.push(o);
+        o.visible = false; // Masquer au départ pour l'effet d'assemblage
       }
     });
 
-    console.log(`Total de pièces valides enregistrées : ${nodes.size}`);
+    console.log(`Nombre total de pièces physiques trouvées : ${allMeshes.length}`);
 
-    // Si aucune référence exacte n'est trouvée dans le fichier, 
-    // on rend tout visible par défaut pour éviter l'écran noir
-    if (nodes.size === 0) {
-      console.warn("Aucune pièce nommée trouvée, affichage direct de tout le root des pièces.");
-      partsRoot.traverse(o => { if (o.isMesh) o.visible = true; });
-    } else {
-      // Lancer l'affichage de la première étape une fois chargé
-      showStep(0);
-    }
+    // Lancer l'affichage de la première étape une fois chargé
+    showStep(0);
 
   } catch (err) {
     console.error("Erreur lors du chargement des modèles 3D :", err);
@@ -141,22 +135,18 @@ function showStep(idx) {
   document.getElementById('cBlurb').textContent = s.blurb;
     
   if (idx === 7) {
-    nodes.forEach(n => n.visible = true);
-    if(partsRoot) partsRoot.traverse(o => { if(o.isMesh) o.visible = true; });
+    // Étape finale : afficher toutes les pièces
+    allMeshes.forEach(m => m.visible = true);
   } else {
-    // Masquer tout d'abord
-    nodes.forEach(n => n.visible = false);
-    if(partsRoot) partsRoot.traverse(o => { if(o.isMesh) o.visible = false; });
+    // Répartition proportionnelle des pièces par lots sur les 7 premières étapes
+    const chunkCount = Math.ceil(allMeshes.length / 7);
+    const visibleLimit = (idx + 1) * chunkCount;
 
-    // Afficher les éléments jusqu'à l'étape actuelle
-    for(let i=0; i<=idx; i++) {
-        if(STEPS[i].refs) {
-            STEPS[i].refs.forEach(r => {
-                if(nodes.has(r)) nodes.get(r).visible = true;
-            });
-        }
-    }
+    allMeshes.forEach((m, i) => {
+      m.visible = (i < visibleLimit);
+    });
   }
+
   document.getElementById('btnBack').disabled = (idx === 0);
   document.getElementById('btnNext').textContent = (idx === 7) ? 'Finish 🏆' : 'Next →';
 }
