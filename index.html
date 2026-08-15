@@ -76,13 +76,15 @@ document.getElementById('viewport').appendChild(renderer.domElement);
 const scene = new THREE.Scene(); 
 scene.background = new THREE.Color(0x0b1622);
 const camera = new THREE.PerspectiveCamera(40, innerWidth/innerHeight, 0.01, 50);
+camera.position.set(0, 0.2, 0.3);
+
 const controls = new OrbitControls(camera, renderer.domElement);
 controls.enableDamping = true;
 
-scene.add(camera);
 const light = new THREE.DirectionalLight(0xffffff, 1.5);
 light.position.set(0, 0, 1);
 camera.add(light);
+scene.add(camera);
 
 const ROOT = new THREE.Group(); 
 scene.add(ROOT);
@@ -102,23 +104,32 @@ async function load() {
     partsRoot = pRes.scene;
     ROOT.add(partsRoot);
         
-    // Inspection détaillée de la structure
+    // Enregistrement des meshes réels (en excluant les 'empty')
     partsRoot.traverse(o => {
-      console.log(`Objet trouvé : Type = ${o.type}, Nom = ${o.name}`);
-      
-      // On accepte tout objet qui a un nom (même s'il commence par empty pour l'instant, pour voir)
-      if (o.name) {
+      if (o.isMesh && o.name && !o.name.toLowerCase().startsWith('empty')) {
+        console.log(`Pièce 3D valide enregistrée : ${o.name}`);
         nodes.set(o.name, o);
       }
     });
 
-    console.log(`Total d'éléments enregistrés dans nodes : ${nodes.size}`);
+    console.log(`Total de pièces valides enregistrées : ${nodes.size}`);
+
+    // Si aucune référence exacte n'est trouvée dans le fichier, 
+    // on rend tout visible par défaut pour éviter l'écran noir
+    if (nodes.size === 0) {
+      console.warn("Aucune pièce nommée trouvée, affichage direct de tout le root des pièces.");
+      partsRoot.traverse(o => { if (o.isMesh) o.visible = true; });
+    } else {
+      // Lancer l'affichage de la première étape une fois chargé
+      showStep(0);
+    }
 
   } catch (err) {
     console.error("Erreur lors du chargement des modèles 3D :", err);
+    document.getElementById('cTitle').textContent = "Erreur de chargement";
+    document.getElementById('cBlurb').textContent = "Vérifiez la console et le chemin des fichiers GLB.";
   }
 }
-
   
 function showStep(idx) {
   stepIndex = idx;
@@ -131,8 +142,13 @@ function showStep(idx) {
     
   if (idx === 7) {
     nodes.forEach(n => n.visible = true);
+    if(partsRoot) partsRoot.traverse(o => { if(o.isMesh) o.visible = true; });
   } else {
+    // Masquer tout d'abord
     nodes.forEach(n => n.visible = false);
+    if(partsRoot) partsRoot.traverse(o => { if(o.isMesh) o.visible = false; });
+
+    // Afficher les éléments jusqu'à l'étape actuelle
     for(let i=0; i<=idx; i++) {
         if(STEPS[i].refs) {
             STEPS[i].refs.forEach(r => {
