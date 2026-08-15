@@ -3,361 +3,166 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-<title>Build an ESC — DEXI Ground School</title>
+<title>OpenFC — Flight Controller Visualizer</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet">
 <style>
-  :root{ --cyan:#00A7E1; --ok:#37e0a0; --warn:#ffb068; --ink:#eaf4fb; --dim:#9fc0d6; }
+  :root{ --cyan:#00A7E1; --ok:#37e0a0; --ink:#eaf4fb; --dim:#9fc0d6; }
   *{box-sizing:border-box}
-  html,body{margin:0;height:100%;overflow:hidden;background:#0b1622;
-    font-family:Inter,system-ui,sans-serif;color:var(--ink);-webkit-user-select:none;user-select:none;-webkit-tap-highlight-color:transparent}
+  html,body{margin:0;height:100%;overflow:hidden;background:#0b1622;font-family:Inter,system-ui,sans-serif;color:var(--ink);-webkit-user-select:none;user-select:none;}
   #viewport{width:100%;height:100%;position:relative}
   canvas{display:block;touch-action:none}
-
-  /* Top bar */
-  #top{position:fixed;top:0;left:0;right:0;z-index:5;padding:14px 18px;
-    background:linear-gradient(180deg,#0b1622f2,#0b162200);pointer-events:none}
+  #top{position:fixed;top:0;left:0;right:0;z-index:5;padding:14px 18px;background:linear-gradient(180deg,#0b1622f2,#0b162200);pointer-events:none}
   #topInner{display:flex;align-items:center;gap:14px;max-width:1180px;margin:0 auto}
-  #logo{flex:none;width:44px;height:44px;border-radius:12px;background:var(--cyan);color:#04222f;
-    display:grid;place-items:center;font-size:22px;box-shadow:0 6px 18px #00a7e155}
+  #logo{flex:none;width:44px;height:44px;border-radius:12px;background:var(--cyan);color:#04222f;display:grid;place-items:center;font-size:22px;box-shadow:0 6px 18px #00a7e155}
   #ttl{flex:1;min-width:0}
-  #ttl b{font-size:17px;font-weight:900;display:block;line-height:1.15}
-  #ttl span{font-size:12.5px;color:var(--dim)}
-  #prog{flex:none;text-align:right;font-size:12px;color:var(--dim);line-height:1.4}
-  #prog b{color:var(--ink);font-size:16px;font-weight:900}
+  #prog{flex:none;text-align:right;font-size:12px;color:var(--dim)}
   #bar{max-width:1180px;margin:11px auto 0;height:6px;border-radius:4px;background:#16304a;overflow:hidden}
-  #barFill{height:100%;width:0;border-radius:4px;background:linear-gradient(90deg,var(--cyan),var(--ok));transition:width .5s cubic-bezier(.2,.9,.25,1)}
-
-  /* Teaching card */
-  #card{position:fixed;left:18px;bottom:18px;z-index:6;width:min(400px,calc(100vw - 36px));
-    background:linear-gradient(180deg,#0e2236f6,#0a1825f6);border:1px solid #1c3950;border-radius:18px;
-    padding:16px 18px 15px;box-shadow:0 16px 44px #0009;border-left:4px solid var(--cyan);max-height:80vh;overflow-y:auto}
-  #card .ch{display:flex;align-items:flex-start;gap:11px}
-  #card .em{font-size:26px;line-height:1.05}
-  #card h3{margin:0;font-size:18.5px;font-weight:900;letter-spacing:-.015em;line-height:1.2}
-  #card .what{font-size:13px;color:var(--cyan);font-weight:800;margin-top:3px}
-  #card p{font-size:13.6px;color:#c4dced;line-height:1.55;margin:11px 0 0}
-  #card p b{color:#fff;font-weight:800}
-  #card .meta{margin-top:12px;padding-top:10px;border-top:1px solid #16324a;display:flex;gap:8px;flex-wrap:wrap;align-items:center}
-  .chip{font:800 10.5px Inter;letter-spacing:.04em;text-transform:uppercase;
-    border-radius:999px;padding:4px 9px;background:#123049;color:#8fc2e0;border:1px solid #1d4362}
-  #card .refs{margin-top:8px;font:700 11px ui-monospace,Menlo,monospace;color:#6f96b1;line-height:1.5;word-break:break-word}
-
-  /* Controls */
+  #barFill{height:100%;width:0;border-radius:4px;background:linear-gradient(90deg,var(--cyan),var(--ok));transition:width .5s}
+  #card{position:fixed;left:18px;bottom:18px;z-index:6;width:400px;background:#0e2236f6;border-left:4px solid var(--cyan);padding:20px;border-radius:18px;box-shadow:0 10px 30px #000;max-height:80vh;overflow-y:auto}
+  #card h3{margin:0;font-size:1.2rem}
+  #card p{font-size:0.9rem;color:var(--dim);line-height:1.5}
   #ctl{position:fixed;right:18px;bottom:18px;z-index:6;display:flex;gap:9px;align-items:center}
-  .btn{border:1px solid #244863;background:#102a40e6;color:var(--ink);border-radius:11px;
-    padding:12px 16px;font:800 13.5px Inter;cursor:pointer;transition:.12s;white-space:nowrap}
-  .btn:hover:not(:disabled){border-color:var(--cyan);background:#13405c}
-  .btn:disabled{opacity:0.5;cursor:not-allowed}
-  .btn.pri{background:linear-gradient(180deg,#0d84b8,#0a6d99);border-color:#1ba0dc;color:#fff}
-  .btn.sm{padding:10px 12px;font-size:13px}
-
-  /* View buttons */
-  #viewBtns{position:fixed;top:80px;right:18px;z-index:6;display:flex;gap:6px}
-  #status{position:fixed;top:82px;left:50%;transform:translateX(-50%);z-index:5;
-    font:800 12.5px Inter;color:#bfe0f2;background:#0e2438dd;border:1px solid #244863;border-radius:999px;
-    padding:7px 16px;text-align:center}
+  .btn{border:1px solid #244863;background:#102a40e6;color:var(--ink);border-radius:11px;padding:12px 16px;font:800 13.5px Inter;cursor:pointer}
+  .btn.pri{background:linear-gradient(180deg,#0d84b8,#0a6d99);color:#fff}
+  .sm{padding:10px 12px;font-size:13px}
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
-<script type="importmap">
-{ "imports": { "three": "https://unpkg.com/three@0.163.0/build/three.module.js", "three/addons/": "https://unpkg.com/three@0.163.0/examples/jsm/" } }
-</script>
+<script type="importmap">{ "imports": { "three": "https://unpkg.com/three@0.163.0/build/three.module.js", "three/addons/": "https://unpkg.com/three@0.163.0/examples/jsm/" } }</script>
 </head>
 <body>
   <div id="top"><div id="topInner">
-    <div id="logo">⚡</div>
-    <div id="ttl"><b>Build an ESC</b><span>One motor channel, one part at a time — then × 4</span></div>
-    <div id="prog"><b id="pCount">1/8</b><br><span>build steps</span></div>
+    <div id="logo">🚀</div>
+    <div id="ttl"><b>OpenFC Build</b><span>Contrôleur de vol Open-Source</span></div>
+    <div id="prog"><b id="pCount">1/8</b><br><span>étapes</span></div>
   </div><div id="bar"><div id="barFill"></div></div></div>
-
-  <div id="status">Chargement de la carte et des pièces...</div>
-
-  <div id="viewBtns">
-    <label class="btn sm" style="display:flex; align-items:center; gap:6px; cursor:pointer;">
-      <input type="checkbox" id="chkSpin" style="margin:0; cursor:pointer; accent-color: var(--cyan);"> Auto-spin
-    </label>
-    <button class="btn sm" id="btnIso">ISO</button>
-    <button class="btn sm" id="btnFront">Front</button>
+  <div id="viewBtns" style="position:fixed;top:80px;right:18px;z-index:6;display:flex;gap:6px">
+    <label class="btn sm"><input type="checkbox" id="chkSpin"> Auto-spin</label>
     <button class="btn sm" id="btnFlip">🔄 Flip</button>
   </div>
-
   <div id="card">
-    <div class="ch"><span class="em" id="cEm">⚡</span><div><h3 id="cTitle"></h3><div class="what" id="cWhat"></div></div></div>
+    <h3 id="cTitle">Chargement...</h3>
+    <div id="cWhat" style="color:var(--cyan); font-weight:bold; margin-bottom:5px"></div>
     <p id="cBlurb"></p>
-    <div class="meta"><span class="chip" id="cStage"></span><span class="chip" id="cFace"></span></div>
-    <div class="refs" id="cRefs"></div>
+    <div id="cRefs" style="font-family:monospace; font-size:0.7rem; color:#6f96b1; margin-top:10px"></div>
   </div>
-
   <div id="viewport"></div>
-
   <div id="ctl">
-    <button class="btn sm" id="btnReframe">🎯 Re-frame</button>
+    <button class="btn sm" id="btnReframe">🎯 Reset</button>
     <button class="btn" id="btnBack" disabled>← Back</button>
     <button class="btn pri" id="btnNext">Next →</button>
   </div>
-
 <script type="module">
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
-import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { MeshoptDecoder } from 'three/addons/libs/meshopt_decoder.module.js';
 
-const ASSETS = './assets/dexi-esc-explorer';
-
+const ASSETS = './assets/openfc-visualizer'; 
 const STEPS = [
-  {
-    em:'🔀', stage:'POWER STAGE', face:'ON BOTH FACES',
-    title:'Six switches, in three pairs',
-    what:'The MOSFETs — the muscle',
-    refs:(m,ch)=>ch.fets,
-    blurb:`A MOSFET is just a <b>switch you turn on with a voltage</b>. Two of its legs are the switch itself; the third — the <b>gate</b> — is the handle. The gate behaves like a tiny bucket for electric charge: shove charge in and the switch closes, yank it out and it opens. Six of them stack into <b>three pairs</b>, one on top of the other. The point where each pair meets is a motor wire — a <b>phase</b>. Flip the top one on and that wire is pulled up to the battery; flip the bottom one on and it's pulled down to ground. Three phases, switched in the right order, is exactly what spins a brushless motor. One iron rule: the two switches in a pair must never be on together, or the battery is shorted straight to ground through both of them. Look closely — two of these three pairs are stacked <b>through the board</b>, one switch on top and its partner directly underneath.`
-  },
-  {
-    em:'🧱', stage:'POWER STAGE', face:'ON BOTH FACES',
-    title:'Ceramics, packed in tight',
-    what:'Local capacitors — the #1 thing that kills ESCs',
-    refs:(m,ch)=>ch.loop_caps,
-    blurb:`Every time a switch flips, the current through it has to change <b>enormously, in billionths of a second</b>. If that gulp of current has to travel from far away, the length of the wire fights back — that's inductance, and it answers with a <b>voltage spike</b> (V = L × di/dt). Big enough spike, and the switch is destroyed. So the board puts capacitors <b>right up against the switches</b> — a little charge reservoir millimetres away, so the loop the current runs around stays tiny. Boring parts. They are the difference between an ESC that lasts and an ESC that pops.`
-  },
-  {
-    em:'🚦', stage:'MEASUREMENT', face:'ON BOTH FACES',
-    title:'The toll booth',
-    what:'Shunt resistor + current-sense amplifier',
-    refs:(m,ch)=>[...m.shared.shunts, m.shared.ina],
-    blurb:`To know how hard the motors are working, the board measures current — and the only way to measure current is to make it <b>squeeze through something</b>. That's the shunt: a deliberately, absurdly small resistor (<b>0.2 milliohms</b>, two in parallel = 0.1) sitting in the battery feed. Every amp that goes to the motors goes through it, and drops a <b>tiny voltage</b> — a tenth of a volt at a thousand amps' worth of squeeze. An amplifier right beside it magnifies that whisper 100×. The trick is <b>Kelvin sensing</b>: the two measuring wires carry no current of their own, so they read the resistor itself and not the copper leading up to it.`
-  },
-  {
-    em:'💪', stage:'CONTROL', face:'BACK FACE',
-    title:'The muscle chip',
-    what:'Gate driver + bootstrap caps + gate resistors',
-    refs:(m,ch)=>[ch.driver, ...ch.bootstrap, ...(ch.gate_res||[])],
-    blurb:`Remember the gate is a <b>charge bucket</b>. A microcontroller pin can only trickle charge — the switch would spend ages half-on, and a half-on switch is a heater. So a driver chip sits between them and does the heavy lifting: it <b>slams</b> charge into the gate and <b>rips</b> it back out, so the switch snaps between fully on and fully off. It lives right next to the MOSFETs so the path is short. The little caps beside it are <b>bootstraps</b> — each upper switch floats up and down with its motor wire, so it needs its own private battery, topped up every time that wire swings low. The little resistors take the opposite side of the argument: they slow each edge a fraction, to tame the ringing a violently fast switch throws off.`
-  },
-  {
-    em:'🧠', stage:'CONTROL', face:'BACK FACE',
-    title:'The brain — one per motor',
-    what:'Microcontroller running open-source AM32 firmware',
-    refs:(m,ch)=>[ch.mcu, ...(ch.mcu_support||[])],
-    blurb:`This channel has its <b>own little computer</b> — it isn't sharing one with the other three. It listens to the flight controller for a throttle number, then fires the six switches in sequence. But how does it know where the magnets in the motor are right now, with no position sensor anywhere? It <b>listens to the motor</b>. A spinning motor generates its own voltage (back-EMF), and the brain watches the one phase it isn't currently driving to feel the rotor go past — thousands of times a second. That's <b>sensorless commutation</b>, and the firmware doing it here is open source.`
-  },
-  {
-    em:'🪣', stage:'SUPPLY', face:'BACK FACE',
-    title:'Stepping the battery down — twice',
-    what:'Buck converter → 10 V, then a regulator → 3.3 V',
-    refs:(m,ch)=>[m.shared.buck, m.shared.inductor, m.shared.ldo, ...(m.shared.supply_support||[])],
-    blurb:`The battery can be 25 volts. The brain wants <b>3.3</b>. But the gate driver wants about <b>10</b> — because to hold a switch properly on you have to lift its gate well above the wire it's switching. So there are two steps. First a <b>buck converter</b>, which chops the battery on and off very fast and uses a coil to smooth the average down to 10 V — it throws almost nothing away as heat. Then a simpler regulator trims 10 V down to a clean, quiet 3.3 V for the brain. Everything on this board hangs off those two rails.`
-  },
-  {
-    em:'🚪', stage:'INPUT', face:'ON BOTH FACES',
-    title:'The front door',
-    what:'Battery pads, signal connector, surge protection',
-    refs:(m,ch)=>[m.shared.connector, ...m.shared.tvs, ...(m.placement&&m.placement.U3?['U3']:[])],
-    blurb:`Battery in, signals in. The fat pads take the battery — and the pilot solders a <b>big capacitor</b> right there, because the wires running back to the battery are long, and long wires spike (the same physics as step 2, at a bigger scale). The little clamps are <b>TVS diodes</b>: normally invisible, but if a surge arrives they short it to ground and take the hit themselves. The small connector carries the four throttle signals from the flight controller — plus telemetry back, sent <i>along the same wires</i>. Notice all of this is shared. Which is the whole point of the last step...`
-  },
-  {
-    em:'🧩', stage:'THE 4-IN-1', face:'ON BOTH FACES',
-    title:'Now do that four times',
-    what:'One channel per motor, tiled into quadrants',
-    refs:()=>null,
-    blurb:`A "4-in-1" isn't one clever controller driving four motors — it's <b>four complete ESCs sharing a board</b>. Each quadrant is its own brain, its own driver, its own six switches. Look at where things sit: the switches live out on the <b>edges</b>, where the heat can escape and the motor wires are closest; brains and drivers hide in the <b>middle</b>, away from all that switching noise. Twenty-four switches won't fit on one face, so they're on <b>both</b> — the board is built on both sides. And the parts everybody shares — the supply, the current meter, the connector — are built once, in the centre.`
-  }
+  {title:'The Heart', what:'MCU (RP2354B)', blurb:'Installation du microcontrôleur principal.'},
+  {title:'The Gyro', what:'IMU (BMI270)', blurb:'Installation de l\'unité de mesure inertielle.'},
+  {title:'Video/OSD', what:'OSD Chip', blurb:'Circuit d\'incrustation vidéo.'},
+  {title:'Blackbox', what:'MicroSD Slot', blurb:'Port carte SD pour les logs.'},
+  {title:'Power', what:'Buck & LDO', blurb:'Gestion de l\'alimentation 5V/3.3V.'},
+  {title:'Radio', what:'ExpressLRS', blurb:'Module radio intégré.'},
+  {title:'Input/Output', what:'USB-C & Pads', blurb:'Connectique et alimentation.'},
+  {title:'Final Assembly', what:'Ready to fly', blurb:'Assemblage terminé.'}
 ];
 
 const renderer = new THREE.WebGLRenderer({ antialias:true });
-renderer.setPixelRatio(Math.min(2, devicePixelRatio));
 renderer.setSize(innerWidth, innerHeight);
-renderer.shadowMap.enabled = true;
-renderer.toneMapping = THREE.ACESFilmicToneMapping; renderer.toneMappingExposure = 1.05;
 document.getElementById('viewport').appendChild(renderer.domElement);
 
-const scene = new THREE.Scene();
+const scene = new THREE.Scene(); 
 scene.background = new THREE.Color(0x0b1622);
-const camera = new THREE.PerspectiveCamera(40, innerWidth/innerHeight, 0.001, 50);
+const camera = new THREE.PerspectiveCamera(40, innerWidth/innerHeight, 0.01, 50);
+camera.position.set(0, 0.2, 0.3);
 
 const controls = new OrbitControls(camera, renderer.domElement);
-controls.enableDamping = true; 
-controls.dampingFactor = 0.08;
-controls.autoRotateSpeed = 2.0;
-controls.autoRotate = false;
-// Cible initiale au centre absolu
-controls.target.set(0, 0, 0);
+controls.enableDamping = true;
 
-scene.add(new THREE.HemisphereLight(0xdcefff, 0x2f3f52, 0.65));
-scene.add(new THREE.AmbientLight(0xffffff, 0.4));
-
+const light = new THREE.DirectionalLight(0xffffff, 1.5);
+light.position.set(0, 0, 1);
+camera.add(light);
 scene.add(camera);
-const headLight = new THREE.DirectionalLight(0xfff4e2, 1.2);
-headLight.position.set(0, 0, 1);
-camera.add(headLight);
 
-scene.environment = new THREE.PMREMGenerator(renderer).fromScene(new RoomEnvironment(), 0.04).texture;
-
-let MAN = null, CH = null;
 const ROOT = new THREE.Group(); 
 scene.add(ROOT);
-let boardRoot = null, partsRoot = null;
-const boardMats = [];
-let stepIndex = 0;
-let flipped = false;
-let maxDim = 0.2; // Valeur par défaut de secours
+let partsRoot = null;
+let allMeshes = [];
+let stepIndex = 0, flipped = false;
 
-const loader = new GLTFLoader();
-loader.setMeshoptDecoder(MeshoptDecoder);
-
-async function loadESC() {
+async function load() {
+  const loader = new GLTFLoader().setMeshoptDecoder(MeshoptDecoder);
   try {
-    const res = await fetch(`${ASSETS}/esc-manifest.json`);
-    MAN = await res.json();
-    CH = MAN.channels[0];
-
     const [bRes, pRes] = await Promise.all([
-      loader.loadAsync(`${ASSETS}/esc-board.glb`),
-      loader.loadAsync(`${ASSETS}/esc-parts.glb`)
+      loader.loadAsync(`${ASSETS}/fc-board.glb`),
+      loader.loadAsync(`${ASSETS}/fc-parts.glb`)
     ]);
-
-    boardRoot = bRes.scene;
-    boardRoot.traverse(ch => {
-      if (ch.isMesh && ch.material) {
-        ch.material.transparent = true;
-        boardMats.push(ch.material);
-      }
-    });
-    ROOT.add(boardRoot);
-
+    
+    ROOT.add(bRes.scene);
     partsRoot = pRes.scene;
     ROOT.add(partsRoot);
+        
+    // Collecter toutes les mailles (meshes) physiques du modèle
+    allMeshes = [];
+    partsRoot.traverse(o => {
+      if (o.isMesh) {
+        allMeshes.push(o);
+        o.visible = false; // Masquer au départ pour l'effet d'assemblage
+      }
+    });
 
-    // Calcul parfait et centrage précis de la boîte englobante
-    const box = new THREE.Box3().setFromObject(ROOT);
-    const centre = box.getCenter(new THREE.Vector3());
-    const size = box.getSize(new THREE.Vector3());
-    maxDim = Math.max(size.x, size.y, size.z);
+    console.log(`Nombre total de pièces physiques trouvées : ${allMeshes.length}`);
 
-    // Recentrage de l'objet racine pour que son origine locale soit rigoureusement (0,0,0)
-    boardRoot.position.sub(centre);
-    partsRoot.position.sub(centre);
-
-    // Configuration ergonomique de la caméra centrée sur la PCB
-    controls.target.set(0, 0, 0);
-    camera.position.set(0, maxDim * 1.8, maxDim * 2.5);
-    controls.update();
-
-    document.getElementById('status').style.display = 'none';
+    // Lancer l'affichage de la première étape une fois chargé
     showStep(0);
+
   } catch (err) {
-    document.getElementById('status').textContent = "Erreur chargement: " + err.message;
-    console.error(err);
+    console.error("Erreur lors du chargement des modèles 3D :", err);
+    document.getElementById('cTitle').textContent = "Erreur de chargement";
+    document.getElementById('cBlurb').textContent = "Vérifiez la console et le chemin des fichiers GLB.";
   }
 }
-
-loadESC();
-
+  
 function showStep(idx) {
   stepIndex = idx;
-  const step = STEPS[idx];
-
+  const s = STEPS[idx];
   document.getElementById('pCount').textContent = `${idx + 1}/8`;
-  document.getElementById('barFill').style.width = `${((idx + 1) / 8) * 100}%`;
-  document.getElementById('cEm').textContent = step.em;
-  document.getElementById('cTitle').textContent = step.title;
-  document.getElementById('cWhat').textContent = step.what;
-  document.getElementById('cBlurb').innerHTML = step.blurb;
-  document.getElementById('cStage').textContent = step.stage;
-  
-  const faceEl = document.getElementById('cFace');
-  faceEl.textContent = step.face;
-  if (step.face === 'BACK FACE') {
-    faceEl.style.color = '#ffd9a8'; faceEl.style.borderColor = '#54402a'; faceEl.style.background = '#2a2015';
-  } else if (step.face.includes('BOTH')) {
-    faceEl.style.color = '#ffb068'; faceEl.style.borderColor = '#664020'; faceEl.style.background = '#331a00';
-  } else {
-    faceEl.style.color = '#8fc2e0'; faceEl.style.borderColor = '#1d4362'; faceEl.style.background = '#123049';
-  }
-
-  const currentRefs = step.refs ? step.refs(MAN, CH) : null;
-  document.getElementById('cRefs').textContent = currentRefs ? `on the board: ${currentRefs.join(' ')}` : '+159 more parts: channels 2–4 and the rest of the ceramic bank';
-
-  const op = (idx === STEPS.length - 1) ? 1.0 : 0.35;
-  boardMats.forEach(m => m.opacity = op);
-
-  const chkSpin = document.getElementById('chkSpin');
-  if (idx === STEPS.length - 1) {
-    partsRoot.traverse(o => { o.visible = true; });
-    chkSpin.checked = true;
-    controls.autoRotate = true;
-  } else {
-    chkSpin.checked = false;
-    controls.autoRotate = false;
-    // Masquer toutes les pièces au départ de l'étape
-    partsRoot.traverse(o => { 
-      if (o.name && !o.name.startsWith('=>')) o.visible = false; 
-    });
+  document.getElementById('barFill').style.width = `${((idx+1)/8)*100}%`;
+  document.getElementById('cTitle').textContent = s.title;
+  document.getElementById('cWhat').textContent = s.what;
+  document.getElementById('cBlurb').textContent = s.blurb;
     
-    // Afficher cumulativement les pièces des étapes de 0 jusqu'à l'étape actuelle
-    for (let i = 0; i <= idx; i++) {
-      const stepRefs = STEPS[i].refs ? STEPS[i].refs(MAN, CH) : null;
-      if (stepRefs) {
-        stepRefs.forEach(ref => {
-          const node = partsRoot.getObjectByName(ref);
-          if (node) {
-            node.visible = true;
-            node.traverse(child => { child.visible = true; });
-          }
-        });
-      }
-    }
+  if (idx === 7) {
+    // Étape finale : afficher toutes les pièces
+    allMeshes.forEach(m => m.visible = true);
+  } else {
+    // Répartition proportionnelle des pièces par lots sur les 7 premières étapes
+    const chunkCount = Math.ceil(allMeshes.length / 7);
+    const visibleLimit = (idx + 1) * chunkCount;
+
+    allMeshes.forEach((m, i) => {
+      m.visible = (i < visibleLimit);
+    });
   }
 
   document.getElementById('btnBack').disabled = (idx === 0);
-  document.getElementById('btnNext').textContent = (idx === STEPS.length - 1) ? 'Finish 🏆' : 'Next →';
+  document.getElementById('btnNext').textContent = (idx === 7) ? 'Finish 🏆' : 'Next →';
 }
 
-document.getElementById('chkSpin').addEventListener('change', (e) => {
-  controls.autoRotate = e.target.checked;
-});
+document.getElementById('btnNext').onclick = () => { if(stepIndex < 7) showStep(++stepIndex); else location.reload(); };
+document.getElementById('btnBack').onclick = () => { if(stepIndex > 0) showStep(--stepIndex); };
+document.getElementById('btnFlip').onclick = () => { flipped = !flipped; gsap.to(ROOT.rotation, {x: flipped ? Math.PI : 0, duration: 1}); };
+document.getElementById('chkSpin').onchange = (e) => controls.autoRotate = e.target.checked;
+document.getElementById('btnReframe').onclick = () => { camera.position.set(0, 0.2, 0.3); controls.target.set(0,0,0); };
 
-document.getElementById('btnNext').onclick = () => {
-  if (stepIndex < STEPS.length - 1) showStep(stepIndex + 1);
-  else location.reload();
-};
-document.getElementById('btnBack').onclick = () => {
-  if (stepIndex > 0) showStep(stepIndex - 1);
-};
+load();
 
-// Vues centrées proprement sur la PCB
-document.getElementById('btnIso').onclick = () => {
-  controls.target.set(0, 0, 0);
-  gsap.to(camera.position, {x: 0, y: maxDim * 1.2, z: maxDim * 1.8, duration: 0.8});
-};
-document.getElementById('btnFront').onclick = () => {
-  controls.target.set(0, 0, 0);
-  gsap.to(camera.position, {x: 0, y: 0, z: maxDim * 2.2, duration: 0.8});
-};
-
-document.getElementById('btnFlip').onclick = () => {
-  flipped = !flipped;
-  gsap.to(ROOT.rotation, {
-    x: flipped ? Math.PI : 0,
-    duration: 1.2,
-    ease: "back.out(1.2)"
-  });
-};
-
-document.getElementById('btnReframe').onclick = () => {
-  controls.target.set(0, 0, 0);
-  gsap.to(camera.position, {x: 0, y: maxDim * 1.8, z: maxDim * 2.5, duration: 0.8});
-};
-
-window.addEventListener('resize', () => {
-  camera.aspect = innerWidth / innerHeight;
-  camera.updateProjectionMatrix();
-  renderer.setSize(innerWidth, innerHeight);
-});
-
-function animate() {
-  requestAnimationFrame(animate);
-  controls.update();
-  renderer.render(scene, camera);
+function animate() { 
+  requestAnimationFrame(animate); 
+  controls.update(); 
+  renderer.render(scene, camera); 
 }
 animate();
 </script>
