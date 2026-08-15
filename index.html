@@ -102,15 +102,17 @@ async function load() {
     partsRoot = pRes.scene;
     ROOT.add(partsRoot);
         
-    // Parcours des pièces avec filtrage des 'empty_*'
+    // Inspection détaillée de la structure
     partsRoot.traverse(o => {
-      // On ne prend que les objets géométriques (isMesh) 
-      // et dont le nom ne commence pas par "empty"
-      if (o.isMesh && o.name && !o.name.toLowerCase().startsWith('empty')) {
-        console.log(`Nom de pièce valide trouvé : ${o.name}`);
+      console.log(`Objet trouvé : Type = ${o.type}, Nom = ${o.name}`);
+      
+      // On accepte tout objet qui a un nom (même s'il commence par empty pour l'instant, pour voir)
+      if (o.name) {
         nodes.set(o.name, o);
       }
     });
+
+    console.log(`Total d'éléments enregistrés dans nodes : ${nodes.size}`);
 
   } catch (err) {
     console.error("Erreur lors du chargement des modèles 3D :", err);
