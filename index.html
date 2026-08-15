@@ -26,7 +26,6 @@
     .btn.pri{background:linear-gradient(180deg,#0d84b8,#0a6d99);color:#fff}
     .sm{padding:10px 12px;font-size:13px}
   </style>
-
   <!-- Importmap pour Three.js -->
   <script type="importmap">
     {
@@ -36,7 +35,6 @@
       }
     }
   </script>
-
   <!-- GSAP pour les animations -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
 </head>
@@ -49,21 +47,17 @@
     </div>
     <div id="bar"><div id="barFill"></div></div>
   </div>
-
   <div id="viewBtns" style="position:fixed;top:80px;right:18px;z-index:6;display:flex;gap:6px">
     <label class="btn sm"><input type="checkbox" id="chkSpin"> Auto-spin</label>
     <button class="btn sm" id="btnFlip">🔄 Flip</button>
   </div>
-
   <div id="card">
     <h3 id="cTitle">Chargement...</h3>
     <div id="cWhat" style="color:var(--cyan); font-weight:bold; margin-bottom:5px"></div>
     <p id="cBlurb"></p>
     <div id="cRefs" style="font-family:monospace; font-size:0.7rem; color:#6f96b1; margin-top:10px"></div>
   </div>
-
   <div id="viewport"></div>
-
   <div id="ctl">
     <button class="btn sm" id="btnReframe">🎯 Reset</button>
     <button class="btn" id="btnBack" disabled>← Back</button>
@@ -78,18 +72,17 @@
     import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 
     const ASSETS = './assets/openfc-visualizer'; 
-    const STEPS = [  
-      {title:'The Heart', what:'MCU (RP2354B)', blurb:'Installation du microcontrôleur principal.'},  
-      {title:'The Gyro', what:'IMU (BMI270)', blurb:'Installation de l\'unité de mesure inertielle.'},  
-      {title:'Video/OSD', what:'OSD Chip', blurb:'Circuit d\'incrustation vidéo.'},  
-      {title:'Blackbox', what:'MicroSD Slot', blurb:'Port carte SD pour les logs.'},  
-      {title:'Power', what:'Buck & LDO', blurb:'Gestion de l\'alimentation 5V/3.3V.'},  
-      {title:'Radio', what:'ExpressLRS', blurb:'Module radio intégré.'},  
-      {title:'Input/Output', what:'USB-C & Pads', blurb:'Connectique et alimentation.'},  
-      {title:'Final Assembly', what:'Ready to fly', blurb:'Assemblage terminé.'}
+    const STEPS = [
+        {title:'The Heart', what:'MCU (RP2354B)', blurb:'Installation du microcontrôleur principal.'},
+        {title:'The Gyro', what:'IMU (BMI270)', blurb:'Installation de l\'unité de mesure inertielle.'},
+        {title:'Video/OSD', what:'OSD Chip', blurb:'Circuit d\'incrustation vidéo.'},
+        {title:'Blackbox', what:'MicroSD Slot', blurb:'Port carte SD pour les logs.'},
+        {title:'Power', what:'Buck & LDO', blurb:'Gestion de l\'alimentation 5V/3.3V.'},
+        {title:'Radio', what:'ExpressLRS', blurb:'Module radio intégré.'},
+        {title:'Input/Output', what:'USB-C & Pads', blurb:'Connectique et alimentation.'},
+        {title:'Final Assembly', what:'Ready to fly', blurb:'Assemblage terminé.'}
     ];
 
-    // Configuration du rendu avec tone mapping pour des couleurs riches et réalistes
     const renderer = new THREE.WebGLRenderer({ antialias: true });
     renderer.setPixelRatio(Math.min(2, devicePixelRatio));
     renderer.setSize(innerWidth, innerHeight);
@@ -99,15 +92,13 @@
     document.getElementById('viewport').appendChild(renderer.domElement);
 
     const scene = new THREE.Scene(); 
-    scene.background = new THREE.Color(0x0b1622);
-    
-    const camera = new THREE.PerspectiveCamera(40, innerWidth/innerHeight, 0.001, 50);
+    scene.background = new THREE.Color(0x0b1622);    
 
+    const camera = new THREE.PerspectiveCamera(40, innerWidth/innerHeight, 0.001, 50);
     const controls = new OrbitControls(camera, renderer.domElement);
     controls.enableDamping = true;
     controls.dampingFactor = 0.08;
 
-    // Éclairage studio réaliste (lumières ambiantes + hémisphérique + lumière frontale attachée à la caméra)
     scene.add(new THREE.HemisphereLight(0xdcefff, 0x2f3f52, 0.65));
     scene.add(new THREE.AmbientLight(0xffffff, 0.4));
 
@@ -116,13 +107,12 @@
     headLight.position.set(0, 0, 1);
     camera.add(headLight);
 
-    // Environnement virtuel pour donner de superbes reflets brillants sur les composants
     const pmremGenerator = new THREE.PMREMGenerator(renderer);
     scene.environment = pmremGenerator.fromScene(new RoomEnvironment(), 0.04).texture;
 
     const ROOT = new THREE.Group(); 
-    scene.add(ROOT);
-    
+    scene.add(ROOT);    
+
     let partsRoot = null;
     let allMeshes = [];
     let stepIndex = 0, flipped = false;
@@ -134,30 +124,36 @@
           loader.loadAsync(`${ASSETS}/fc-board.glb`),
           loader.loadAsync(`${ASSETS}/fc-parts.glb`)
         ]);
-            
+                
         ROOT.add(bRes.scene);
         partsRoot = pRes.scene;
         ROOT.add(partsRoot);
-                
-        // Centrage automatique du modèle
+
+        // Collecte robuste de tous les meshes enfants (même profondément imbriqués)
+        allMeshes = [];
+        partsRoot.traverse(o => {
+          if (o.isMesh) {
+            allMeshes.push(o);
+            o.visible = false; // Cachés au départ pour l'animation par étapes
+            // S'assure que les matériaux réagissent bien à l'éclairage studio
+            if (o.material) {
+              o.material.roughness = Math.min(Math.max(o.material.roughness, 0.1), 0.9);
+            }
+          }
+        });
+
+        console.log(`Modèles chargés avec succès. ${allMeshes.length} pièces détectées.`);
+
+        // Centrage automatique du modèle global
         const box = new THREE.Box3().setFromObject(ROOT);
         const centre = box.getCenter(new THREE.Vector3());
         const size = box.getSize(new THREE.Vector3());
         const maxDim = Math.max(size.x, size.y, size.z);
 
         ROOT.position.sub(centre); 
-
         controls.target.set(0, 0, 0);
         camera.position.set(0, maxDim * 1.0, maxDim * 2.5);
         controls.update();
-
-        allMeshes = [];
-        partsRoot.traverse(o => {
-          if (o.isMesh) {
-            allMeshes.push(o);
-            o.visible = false; 
-          }
-        });
 
         showStep(0);
       } catch (err) {
@@ -175,16 +171,17 @@
       document.getElementById('cTitle').textContent = s.title;
       document.getElementById('cWhat').textContent = s.what;
       document.getElementById('cBlurb').textContent = s.blurb;
-          
-      if (idx === 7) {
-        allMeshes.forEach(m => m.visible = true);
-      } else {
-        const chunkCount = Math.ceil(allMeshes.length / 7);
-        const visibleLimit = (idx + 1) * chunkCount;
-
-        allMeshes.forEach((m, i) => {
-          m.visible = (i < visibleLimit);
-        });
+            
+      if (allMeshes.length > 0) {
+        if (idx === 7) {
+          allMeshes.forEach(m => m.visible = true);
+        } else {
+          const chunkCount = Math.ceil(allMeshes.length / 7);
+          const visibleLimit = (idx + 1) * chunkCount;
+          allMeshes.forEach((m, i) => {
+            m.visible = (i < visibleLimit);
+          });
+        }
       }
 
       document.getElementById('btnBack').disabled = (idx === 0);
@@ -192,23 +189,23 @@
     }
 
     document.getElementById('btnNext').onclick = () => { 
-      if(stepIndex < 7) showStep(++stepIndex); 
-      else location.reload(); 
+       if(stepIndex < 7) showStep(++stepIndex);
+       else location.reload(); 
     };
 
     document.getElementById('btnBack').onclick = () => { 
-      if(stepIndex > 0) showStep(--stepIndex); 
+       if(stepIndex > 0) showStep(--stepIndex);
     };
 
     document.getElementById('btnFlip').onclick = () => { 
-      flipped = !flipped; 
-      gsap.to(ROOT.rotation, {x: flipped ? Math.PI : 0, duration: 1, ease: "back.out(1.2)"}); 
+       flipped = !flipped;
+       gsap.to(ROOT.rotation, {x: flipped ? Math.PI : 0, duration: 1, ease: "back.out(1.2)"});
     };
 
     document.getElementById('chkSpin').onchange = (e) => controls.autoRotate = e.target.checked;
 
     document.getElementById('btnReframe').onclick = () => { 
-      gsap.to(ROOT.rotation, {x: 0, y: 0, z: 0, duration: 0.5});
+       gsap.to(ROOT.rotation, {x: 0, y: 0, z: 0, duration: 0.5});
       const box = new THREE.Box3().setFromObject(ROOT);
       const size = box.getSize(new THREE.Vector3());
       const maxDim = Math.max(size.x, size.y, size.z);
@@ -232,11 +229,10 @@
     load();
 
     function animate() { 
-      requestAnimationFrame(animate); 
-      controls.update(); 
-      renderer.render(scene, camera); 
-    }
-    
+       requestAnimationFrame(animate);
+       controls.update();
+       renderer.render(scene, camera);
+    }    
     animate();
   </script>
 </body>
