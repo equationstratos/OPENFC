@@ -134,10 +134,9 @@
         partsRoot.traverse(o => {
           if (o.isMesh) {
             allMeshes.push(o);
-            o.visible = false; // Cachés au départ pour l'animation par étapes
-            // S'assure que les matériaux réagissent bien à l'éclairage studio
+            o.visible = true; // FORCE L'AFFICHAGE DE TOUTES LES PIÈCES
             if (o.material) {
-              o.material.roughness = Math.min(Math.max(o.material.roughness, 0.1), 0.9);
+              o.material.side = THREE.DoubleSide; // Évite les faces cachées transparentes
             }
           }
         });
