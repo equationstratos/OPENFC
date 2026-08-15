@@ -97,22 +97,27 @@ async function load() {
       loader.loadAsync(`${ASSETS}/fc-board.glb`),
       loader.loadAsync(`${ASSETS}/fc-parts.glb`)
     ]);
+    
     ROOT.add(bRes.scene);
     partsRoot = pRes.scene;
     ROOT.add(partsRoot);
         
-    partsRoot.traverse(o => { 
-         if(o.name) { 
-             nodes.set(o.name, o); 
-             o.visible = false; 
-             console.log("Nom de pièce trouvé : " + o.name); 
-         } 
-     });
-        
-    showStep(0);
-  } catch(e) { console.error(e); }
+    // Parcours des pièces avec filtrage des 'empty_*'
+    partsRoot.traverse(o => {
+      // On ne prend que les objets géométriques (isMesh) 
+      // et dont le nom ne commence pas par "empty"
+      if (o.isMesh && o.name && !o.name.toLowerCase().startsWith('empty')) {
+        console.log(`Nom de pièce valide trouvé : ${o.name}`);
+        nodes.set(o.name, o);
+      }
+    });
+
+  } catch (err) {
+    console.error("Erreur lors du chargement des modèles 3D :", err);
+  }
 }
 
+  
 function showStep(idx) {
   stepIndex = idx;
   const s = STEPS[idx];
