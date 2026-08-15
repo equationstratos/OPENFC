@@ -134,7 +134,8 @@
         ROOT.position.sub(centre); 
 
         controls.target.set(0, 0, 0);
-        camera.position.set(0, maxDim * 0.5, maxDim * 1.2);
+        // Zoom moins rapproché au démarrage (multiplicateur augmenté à 2.5 au lieu de 1.2)
+        camera.position.set(0, maxDim * 1.0, maxDim * 2.5);
         controls.update();
 
         allMeshes = [];
@@ -202,8 +203,8 @@
       controls.target.set(0, 0, 0); 
       gsap.to(camera.position, {
         x: 0, 
-        y: maxDim * 0.5, 
-        z: maxDim * 1.2, 
+        y: maxDim * 1.0, 
+        z: maxDim * 2.5, 
         duration: 0.8,
         onUpdate: () => controls.update()
       });
