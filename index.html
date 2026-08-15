@@ -75,6 +75,7 @@
     import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
     import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
     import { MeshoptDecoder } from 'three/addons/libs/meshopt_decoder.module.js';
+    import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 
     const ASSETS = './assets/openfc-visualizer'; 
     const STEPS = [  
@@ -88,23 +89,36 @@
       {title:'Final Assembly', what:'Ready to fly', blurb:'Assemblage terminé.'}
     ];
 
-    const renderer = new THREE.WebGLRenderer({ antialias:true });
+    // Configuration du rendu avec tone mapping pour des couleurs riches et réalistes
+    const renderer = new THREE.WebGLRenderer({ antialias: true });
+    renderer.setPixelRatio(Math.min(2, devicePixelRatio));
     renderer.setSize(innerWidth, innerHeight);
+    renderer.shadowMap.enabled = true;
+    renderer.toneMapping = THREE.ACESFilmicToneMapping; 
+    renderer.toneMappingExposure = 1.05;
     document.getElementById('viewport').appendChild(renderer.domElement);
 
     const scene = new THREE.Scene(); 
     scene.background = new THREE.Color(0x0b1622);
     
-    const camera = new THREE.PerspectiveCamera(40, innerWidth/innerHeight, 0.01, 50);
+    const camera = new THREE.PerspectiveCamera(40, innerWidth/innerHeight, 0.001, 50);
 
     const controls = new OrbitControls(camera, renderer.domElement);
     controls.enableDamping = true;
     controls.dampingFactor = 0.08;
 
-    const light = new THREE.DirectionalLight(0xffffff, 1.5);
-    light.position.set(0, 0, 1);
-    camera.add(light);
+    // Éclairage studio réaliste (lumières ambiantes + hémisphérique + lumière frontale attachée à la caméra)
+    scene.add(new THREE.HemisphereLight(0xdcefff, 0x2f3f52, 0.65));
+    scene.add(new THREE.AmbientLight(0xffffff, 0.4));
+
     scene.add(camera);
+    const headLight = new THREE.DirectionalLight(0xfff4e2, 1.2);
+    headLight.position.set(0, 0, 1);
+    camera.add(headLight);
+
+    // Environnement virtuel pour donner de superbes reflets brillants sur les composants
+    const pmremGenerator = new THREE.PMREMGenerator(renderer);
+    scene.environment = pmremGenerator.fromScene(new RoomEnvironment(), 0.04).texture;
 
     const ROOT = new THREE.Group(); 
     scene.add(ROOT);
@@ -134,7 +148,6 @@
         ROOT.position.sub(centre); 
 
         controls.target.set(0, 0, 0);
-        // Zoom moins rapproché au démarrage (multiplicateur augmenté à 2.5 au lieu de 1.2)
         camera.position.set(0, maxDim * 1.0, maxDim * 2.5);
         controls.update();
 
@@ -209,6 +222,12 @@
         onUpdate: () => controls.update()
       });
     };
+
+    window.addEventListener('resize', () => {
+      camera.aspect = innerWidth / innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(innerWidth, innerHeight);
+    });
 
     load();
 
