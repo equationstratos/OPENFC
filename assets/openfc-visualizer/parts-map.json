@@ -35,10 +35,10 @@
    "y": -83.33,
    "z": 1.0228,
    "back": false,
-   "meshes": [
-    "empty_2",
-    "empty_3"
-   ],
+   "meshes": {
+    "empty_2": "body",
+    "empty_3": "lead"
+   },
    "bb": [
     [
      158.67,
@@ -61,9 +61,9 @@
    "y": -93.31,
    "z": 1.0228,
    "back": false,
-   "meshes": [
-    "empty_4"
-   ],
+   "meshes": {
+    "empty_4": "body"
+   },
    "bb": [
     [
      152.62,
@@ -87,9 +87,9 @@
    "y": -85.01,
    "z": 1.0228,
    "back": false,
-   "meshes": [
-    "empty_5"
-   ],
+   "meshes": {
+    "empty_5": "body"
+   },
    "bb": [
     [
      159.14,
@@ -113,9 +113,9 @@
    "y": -102.26,
    "z": 1.0228,
    "back": false,
-   "meshes": [
-    "empty_6"
-   ],
+   "meshes": {
+    "empty_6": "body"
+   },
    "bb": [
     [
      143.34,
@@ -138,9 +138,9 @@
    "y": -87.33,
    "z": 1.0228,
    "back": false,
-   "meshes": [
-    "empty_7"
-   ],
+   "meshes": {
+    "empty_7": "body"
+   },
    "bb": [
     [
      158.75,
@@ -164,9 +164,9 @@
    "y": -90.19,
    "z": 1.0228,
    "back": false,
-   "meshes": [
-    "empty_8"
-   ],
+   "meshes": {
+    "empty_8": "body"
+   },
    "bb": [
     [
      161.47,
@@ -190,9 +190,9 @@
    "y": -93.32,
    "z": 1.0228,
    "back": false,
-   "meshes": [
-    "empty_9"
-   ],
+   "meshes": {
+    "empty_9": "body"
+   },
    "bb": [
     [
      151.96,
@@ -215,9 +215,9 @@
    "y": -87.1,
    "z": 1.0228,
    "back": false,
-   "meshes": [
-    "empty_10"
-   ],
+   "meshes": {
+    "empty_10": "body"
+   },
    "bb": [
     [
      148.09,
@@ -240,9 +240,9 @@
    "y": -85.01,
    "z": 1.0228,
    "back": false,
-   "meshes": [
-    "empty_11"
-   ],
+   "meshes": {
+    "empty_11": "body"
+   },
    "bb": [
     [
      160.57,
@@ -266,9 +266,9 @@
    "y": -83.7,
    "z": 1.0228,
    "back": false,
-   "meshes": [
-    "empty_12"
-   ],
+   "meshes": {
+    "empty_12": "body"
+   },
    "bb": [
     [
      146.64,
@@ -292,9 +292,9 @@
    "y": -71.69,
    "z": 1.0228,
    "back": false,
-   "meshes": [
-    "empty_13"
-   ],
+   "meshes": {
+    "empty_13": "body"
+   },
    "bb": [
     [
      142.555,
@@ -317,9 +317,9 @@
    "y": -88.825,
    "z": 1.0228,
    "back": false,
-   "meshes": [
-    "empty_14"
-   ],
+   "meshes": {
+    "empty_14": "body"
+   },
    "bb": [
     [
      160.828,
@@ -342,9 +342,9 @@
    "y": -93.75,
    "z": 1.0228,
    "back": false,
-   "meshes": [
-    "empty_15"
-   ],
+   "meshes": {
+    "empty_15": "body"
+   },
    "bb": [
     [
      149.6,
@@ -367,9 +367,9 @@
    "y": -93.47,
    "z": 1.0228,
    "back": false,
-   "meshes": [
-    "empty_16"
-   ],
+   "meshes": {
+    "empty_16": "body"
+   },
    "bb": [
     [
      160.777,
@@ -392,9 +392,9 @@
    "y": -102.16,
    "z": 1.0228,
    "back": false,
-   "meshes": [
-    "empty_17"
-   ],
+   "meshes": {
+    "empty_17": "body"
+   },
    "bb": [
     [
      145.19,
@@ -418,9 +418,9 @@
    "y": -71.67,
    "z": 1.0228,
    "back": false,
-   "meshes": [
-    "empty_18"
-   ],
+   "meshes": {
+    "empty_18": "body"
+   },
    "bb": [
     [
      144.41,
@@ -444,9 +444,9 @@
    "y": -84.67,
    "z": 1.0228,
    "back": false,
-   "meshes": [
-    "empty_19"
-   ],
+   "meshes": {
+    "empty_19": "body"
+   },
    "bb": [
     [
      146.65,
@@ -470,9 +470,9 @@
    "y": -90.74,
    "z": 1.0228,
    "back": false,
-   "meshes": [
-    "empty_20"
-   ],
+   "meshes": {
+    "empty_20": "body"
+   },
    "bb": [
     [
      146.66,
@@ -496,9 +496,9 @@
    "y": -88.21,
    "z": 1.0228,
    "back": false,
-   "meshes": [
-    "empty_21"
-   ],
+   "meshes": {
+    "empty_21": "body"
+   },
    "bb": [
     [
      146.65,
@@ -522,9 +522,9 @@
    "y": -87.57,
    "z": 1.0228,
    "back": false,
-   "meshes": [
-    "empty_22"
-   ],
+   "meshes": {
+    "empty_22": "body"
+   },
    "bb": [
     [
      146.65,
@@ -548,9 +548,9 @@
    "y": -93.32,
    "z": 1.0228,
    "back": false,
-   "meshes": [
-    "empty_23"
-   ],
+   "meshes": {
+    "empty_23": "body"
+   },
    "bb": [
     [
      151.33,
@@ -573,11 +573,11 @@
    "y": -95.1,
    "z": 1.0228,
    "back": false,
-   "meshes": [
-    "empty_24",
-    "empty_25",
-    "empty_26"
-   ],
+   "meshes": {
+    "empty_24": "lead",
+    "empty_25": "lead",
+    "empty_26": "body"
+   },
    "bb": [
     [
      149.05,
@@ -600,9 +600,9 @@
    "y": -91.26,
    "z": 1.0228,
    "back": false,
-   "meshes": [
-    "empty_27"
-   ],
+   "meshes": {
+    "empty_27": "body"
+   },
    "bb": [
     [
      158.97,
@@ -625,9 +625,9 @@
    "y": -94.2,
    "z": 1.0228,
    "back": false,
-   "meshes": [
-    "empty_28"
-   ],
+   "meshes": {
+    "empty_28": "body"
+   },
    "bb": [
     [
      144.298,
@@ -650,9 +650,9 @@
    "y": -95.3637,
    "z": 1.0228,
    "back": false,
-   "meshes": [
-    "empty_29"
-   ],
+   "meshes": {
+    "empty_29": "body"
+   },
    "bb": [
     [
      146.998,
@@ -676,9 +676,9 @@
    "y": -82.94,
    "z": 1.0228,
    "back": false,
-   "meshes": [
-    "empty_30"
-   ],
+   "meshes": {
+    "empty_30": "body"
+   },
    "bb": [
     [
      146.65,
@@ -702,9 +702,9 @@
    "y": -88.93,
    "z": 1.0228,
    "back": false,
-   "meshes": [
-    "empty_31"
-   ],
+   "meshes": {
+    "empty_31": "body"
+   },
    "bb": [
     [
      158.977,
@@ -727,9 +727,9 @@
    "y": -86.93,
    "z": 1.0228,
    "back": false,
-   "meshes": [
-    "empty_32"
-   ],
+   "meshes": {
+    "empty_32": "body"
+   },
    "bb": [
     [
      146.65,
@@ -753,9 +753,9 @@
    "y": -91.63,
    "z": 1.0228,
    "back": false,
-   "meshes": [
-    "empty_33"
-   ],
+   "meshes": {
+    "empty_33": "body"
+   },
    "bb": [
     [
      146.25,
@@ -779,9 +779,9 @@
    "y": -91.27,
    "z": 1.0228,
    "back": false,
-   "meshes": [
-    "empty_34"
-   ],
+   "meshes": {
+    "empty_34": "body"
+   },
    "bb": [
     [
      160.82,
@@ -804,9 +804,9 @@
    "y": -93.57,
    "z": 1.0228,
    "back": false,
-   "meshes": [
-    "empty_35"
-   ],
+   "meshes": {
+    "empty_35": "body"
+   },
    "bb": [
     [
      158.905,
@@ -829,9 +829,9 @@
    "y": -86.3,
    "z": 1.0228,
    "back": false,
-   "meshes": [
-    "empty_36"
-   ],
+   "meshes": {
+    "empty_36": "body"
+   },
    "bb": [
     [
      146.65,
@@ -855,9 +855,9 @@
    "y": -88.85,
    "z": 1.0228,
    "back": false,
-   "meshes": [
-    "empty_37"
-   ],
+   "meshes": {
+    "empty_37": "body"
+   },
    "bb": [
     [
      146.66,
@@ -881,9 +881,9 @@
    "y": -90.14,
    "z": 1.0228,
    "back": false,
-   "meshes": [
-    "empty_38"
-   ],
+   "meshes": {
+    "empty_38": "body"
+   },
    "bb": [
     [
      146.66,
@@ -907,9 +907,9 @@
    "y": -85.67,
    "z": 1.0228,
    "back": false,
-   "meshes": [
-    "empty_39"
-   ],
+   "meshes": {
+    "empty_39": "body"
+   },
    "bb": [
     [
      146.65,
@@ -933,9 +933,9 @@
    "y": -92.85,
    "z": 1.0228,
    "back": false,
-   "meshes": [
-    "empty_40"
-   ],
+   "meshes": {
+    "empty_40": "body"
+   },
    "bb": [
     [
      149.6,
@@ -958,9 +958,9 @@
    "y": -87.3425,
    "z": 1.0228,
    "back": false,
-   "meshes": [
-    "empty_41"
-   ],
+   "meshes": {
+    "empty_41": "body"
+   },
    "bb": [
     [
      159.55,
@@ -983,9 +983,9 @@
    "y": -85.76,
    "z": 1.0228,
    "back": false,
-   "meshes": [
-    "empty_42"
-   ],
+   "meshes": {
+    "empty_42": "body"
+   },
    "bb": [
     [
      160.24,
@@ -1009,9 +1009,9 @@
    "y": -89.49,
    "z": 1.0228,
    "back": false,
-   "meshes": [
-    "empty_43"
-   ],
+   "meshes": {
+    "empty_43": "body"
+   },
    "bb": [
     [
      146.66,
@@ -1035,9 +1035,9 @@
    "y": -78.145,
    "z": -0.085,
    "back": true,
-   "meshes": [
-    "empty_44"
-   ],
+   "meshes": {
+    "empty_44": "body"
+   },
    "bb": [
     [
      146.657,
@@ -1061,9 +1061,9 @@
    "y": -77.895,
    "z": -0.085,
    "back": true,
-   "meshes": [
-    "empty_45"
-   ],
+   "meshes": {
+    "empty_45": "body"
+   },
    "bb": [
     [
      160.18,
@@ -1087,9 +1087,9 @@
    "y": -81.355,
    "z": -0.085,
    "back": true,
-   "meshes": [
-    "empty_46"
-   ],
+   "meshes": {
+    "empty_46": "body"
+   },
    "bb": [
     [
      160.68,
@@ -1113,19 +1113,19 @@
    "y": -87.67,
    "z": -0.085,
    "back": true,
-   "meshes": [
-    "empty_47",
-    "empty_48",
-    "empty_49",
-    "empty_50",
-    "empty_51",
-    "empty_52",
-    "empty_53",
-    "empty_54",
-    "empty_55",
-    "empty_56",
-    "empty_57"
-   ],
+   "meshes": {
+    "empty_47": "lead",
+    "empty_48": "lead",
+    "empty_49": "lead",
+    "empty_50": "lead",
+    "empty_51": "lead",
+    "empty_52": "lead",
+    "empty_53": "lead",
+    "empty_54": "lead",
+    "empty_55": "lead",
+    "empty_56": "body",
+    "empty_57": "shell"
+   },
    "bb": [
     [
      137.91,
@@ -1148,22 +1148,22 @@
    "y": -102.3675,
    "z": -0.085,
    "back": true,
-   "meshes": [
-    "empty_58",
-    "empty_59",
-    "empty_60",
-    "empty_61",
-    "empty_62",
-    "empty_63",
-    "empty_64",
-    "empty_65",
-    "empty_66",
-    "empty_67",
-    "empty_68",
-    "empty_69",
-    "empty_70",
-    "empty_71"
-   ],
+   "meshes": {
+    "empty_58": "body",
+    "empty_59": "mark",
+    "empty_60": "mark",
+    "empty_61": "mark",
+    "empty_62": "mark",
+    "empty_63": "mark",
+    "empty_64": "mark",
+    "empty_65": "mark",
+    "empty_66": "mark",
+    "empty_67": "mark",
+    "empty_68": "mark",
+    "empty_69": "mark",
+    "empty_70": "mark",
+    "empty_71": "mark"
+   },
    "bb": [
     [
      146.83,
@@ -1186,9 +1186,9 @@
    "y": -79.565,
    "z": -0.085,
    "back": true,
-   "meshes": [
-    "empty_72"
-   ],
+   "meshes": {
+    "empty_72": "body"
+   },
    "bb": [
     [
      160.36,
@@ -1211,9 +1211,9 @@
    "y": -86.6,
    "z": -0.085,
    "back": true,
-   "meshes": [
-    "empty_73"
-   ],
+   "meshes": {
+    "empty_73": "body"
+   },
    "bb": [
     [
      157.19,
@@ -1237,9 +1237,9 @@
    "y": -77.375,
    "z": -0.085,
    "back": true,
-   "meshes": [
-    "empty_74"
-   ],
+   "meshes": {
+    "empty_74": "body"
+   },
    "bb": [
     [
      145.31,
@@ -1263,9 +1263,9 @@
    "y": -86.25,
    "z": -0.085,
    "back": true,
-   "meshes": [
-    "empty_75"
-   ],
+   "meshes": {
+    "empty_75": "body"
+   },
    "bb": [
     [
      155.91,
@@ -1289,22 +1289,22 @@
    "y": -102.3575,
    "z": -0.085,
    "back": true,
-   "meshes": [
-    "empty_76",
-    "empty_77",
-    "empty_78",
-    "empty_79",
-    "empty_80",
-    "empty_81",
-    "empty_82",
-    "empty_83",
-    "empty_84",
-    "empty_85",
-    "empty_86",
-    "empty_87",
-    "empty_88",
-    "empty_89"
-   ],
+   "meshes": {
+    "empty_76": "body",
+    "empty_77": "mark",
+    "empty_78": "mark",
+    "empty_79": "mark",
+    "empty_80": "mark",
+    "empty_81": "mark",
+    "empty_82": "mark",
+    "empty_83": "mark",
+    "empty_84": "mark",
+    "empty_85": "mark",
+    "empty_86": "mark",
+    "empty_87": "mark",
+    "empty_88": "mark",
+    "empty_89": "mark"
+   },
    "bb": [
     [
      155.78,
@@ -1327,9 +1327,9 @@
    "y": -95.99,
    "z": -0.085,
    "back": true,
-   "meshes": [
-    "empty_90"
-   ],
+   "meshes": {
+    "empty_90": "body"
+   },
    "bb": [
     [
      159.7,
@@ -1353,9 +1353,9 @@
    "y": -95.72,
    "z": -0.085,
    "back": true,
-   "meshes": [
-    "empty_91"
-   ],
+   "meshes": {
+    "empty_91": "body"
+   },
    "bb": [
     [
      162.03,
@@ -1378,9 +1378,9 @@
    "y": -79.575,
    "z": -0.085,
    "back": true,
-   "meshes": [
-    "empty_92"
-   ],
+   "meshes": {
+    "empty_92": "body"
+   },
    "bb": [
     [
      162.389,
@@ -1403,9 +1403,9 @@
    "y": -94.95,
    "z": -0.085,
    "back": true,
-   "meshes": [
-    "empty_93"
-   ],
+   "meshes": {
+    "empty_93": "body"
+   },
    "bb": [
     [
      167.57,
@@ -1429,22 +1429,22 @@
    "y": -72.67,
    "z": -0.085,
    "back": true,
-   "meshes": [
-    "empty_94",
-    "empty_95",
-    "empty_96",
-    "empty_97",
-    "empty_98",
-    "empty_99",
-    "empty_100",
-    "empty_101",
-    "empty_102",
-    "empty_103",
-    "empty_104",
-    "empty_105",
-    "empty_106",
-    "empty_107"
-   ],
+   "meshes": {
+    "empty_94": "body",
+    "empty_95": "mark",
+    "empty_96": "mark",
+    "empty_97": "mark",
+    "empty_98": "mark",
+    "empty_99": "mark",
+    "empty_100": "mark",
+    "empty_101": "mark",
+    "empty_102": "mark",
+    "empty_103": "mark",
+    "empty_104": "mark",
+    "empty_105": "mark",
+    "empty_106": "mark",
+    "empty_107": "mark"
+   },
    "bb": [
     [
      159.14,
@@ -1467,9 +1467,9 @@
    "y": -81.55,
    "z": -0.085,
    "back": true,
-   "meshes": [
-    "empty_108"
-   ],
+   "meshes": {
+    "empty_108": "body"
+   },
    "bb": [
     [
      155.35,
@@ -1493,9 +1493,9 @@
    "y": -85.55,
    "z": -0.085,
    "back": true,
-   "meshes": [
-    "empty_109"
-   ],
+   "meshes": {
+    "empty_109": "body"
+   },
    "bb": [
     [
      155.92,
@@ -1519,9 +1519,9 @@
    "y": -97.03,
    "z": -0.085,
    "back": true,
-   "meshes": [
-    "empty_110"
-   ],
+   "meshes": {
+    "empty_110": "body"
+   },
    "bb": [
     [
      159.48,
@@ -1545,9 +1545,9 @@
    "y": -89.81,
    "z": -0.085,
    "back": true,
-   "meshes": [
-    "empty_111"
-   ],
+   "meshes": {
+    "empty_111": "body"
+   },
    "bb": [
     [
      151.88,
@@ -1571,9 +1571,9 @@
    "y": -83.16,
    "z": -0.085,
    "back": true,
-   "meshes": [
-    "empty_112"
-   ],
+   "meshes": {
+    "empty_112": "body"
+   },
    "bb": [
     [
      155.8,
@@ -1597,24 +1597,24 @@
    "y": -102.74,
    "z": -0.085,
    "back": true,
-   "meshes": [
-    "empty_113",
-    "empty_114",
-    "empty_115",
-    "empty_116",
-    "empty_117",
-    "empty_118",
-    "empty_119",
-    "empty_120",
-    "empty_121",
-    "empty_122",
-    "empty_123",
-    "empty_124",
-    "empty_125",
-    "empty_126",
-    "empty_127",
-    "empty_128"
-   ],
+   "meshes": {
+    "empty_113": "body",
+    "empty_114": "lead",
+    "empty_115": "lead",
+    "empty_116": "mark",
+    "empty_117": "mark",
+    "empty_118": "mark",
+    "empty_119": "mark",
+    "empty_120": "mark",
+    "empty_121": "mark",
+    "empty_122": "mark",
+    "empty_123": "mark",
+    "empty_124": "mark",
+    "empty_125": "mark",
+    "empty_126": "mark",
+    "empty_127": "mark",
+    "empty_128": "mark"
+   },
    "bb": [
     [
      141.48,
@@ -1637,9 +1637,9 @@
    "y": -81.54,
    "z": -0.085,
    "back": true,
-   "meshes": [
-    "empty_129"
-   ],
+   "meshes": {
+    "empty_129": "body"
+   },
    "bb": [
     [
      153.91,
@@ -1662,9 +1662,9 @@
    "y": -82.7,
    "z": -0.085,
    "back": true,
-   "meshes": [
-    "empty_130"
-   ],
+   "meshes": {
+    "empty_130": "body"
+   },
    "bb": [
     [
      151.18,
@@ -1688,9 +1688,9 @@
    "y": -93.52,
    "z": -0.085,
    "back": true,
-   "meshes": [
-    "empty_131"
-   ],
+   "meshes": {
+    "empty_131": "body"
+   },
    "bb": [
     [
      160.31,
@@ -1714,24 +1714,24 @@
    "y": -77.595,
    "z": -0.085,
    "back": true,
-   "meshes": [
-    "empty_132",
-    "empty_133",
-    "empty_134",
-    "empty_135",
-    "empty_136",
-    "empty_137",
-    "empty_138",
-    "empty_139",
-    "empty_140",
-    "empty_141",
-    "empty_142",
-    "empty_143",
-    "empty_144",
-    "empty_145",
-    "empty_146",
-    "empty_147"
-   ],
+   "meshes": {
+    "empty_132": "body",
+    "empty_133": "lead",
+    "empty_134": "lead",
+    "empty_135": "mark",
+    "empty_136": "mark",
+    "empty_137": "mark",
+    "empty_138": "mark",
+    "empty_139": "mark",
+    "empty_140": "mark",
+    "empty_141": "mark",
+    "empty_142": "mark",
+    "empty_143": "mark",
+    "empty_144": "mark",
+    "empty_145": "mark",
+    "empty_146": "mark",
+    "empty_147": "mark"
+   },
    "bb": [
     [
      141.83,
@@ -1754,9 +1754,9 @@
    "y": -87.62,
    "z": -0.085,
    "back": true,
-   "meshes": [
-    "empty_148"
-   ],
+   "meshes": {
+    "empty_148": "body"
+   },
    "bb": [
     [
      162.98,
@@ -1779,9 +1779,9 @@
    "y": -97.03,
    "z": -0.085,
    "back": true,
-   "meshes": [
-    "empty_149"
-   ],
+   "meshes": {
+    "empty_149": "body"
+   },
    "bb": [
     [
      142.69,
@@ -1805,9 +1805,9 @@
    "y": -83.81,
    "z": -0.085,
    "back": true,
-   "meshes": [
-    "empty_150"
-   ],
+   "meshes": {
+    "empty_150": "body"
+   },
    "bb": [
     [
      152.8,
@@ -1830,9 +1830,9 @@
    "y": -97.14,
    "z": -0.085,
    "back": true,
-   "meshes": [
-    "empty_151"
-   ],
+   "meshes": {
+    "empty_151": "body"
+   },
    "bb": [
     [
      166.547,
@@ -1856,9 +1856,9 @@
    "y": -99.24,
    "z": -0.085,
    "back": true,
-   "meshes": [
-    "empty_152"
-   ],
+   "meshes": {
+    "empty_152": "body"
+   },
    "bb": [
     [
      144.545,
@@ -1882,9 +1882,9 @@
    "y": -82.82,
    "z": -0.085,
    "back": true,
-   "meshes": [
-    "empty_153"
-   ],
+   "meshes": {
+    "empty_153": "body"
+   },
    "bb": [
     [
      151.96,
@@ -1908,22 +1908,22 @@
    "y": -94.91,
    "z": -0.085,
    "back": true,
-   "meshes": [
-    "empty_154",
-    "empty_155",
-    "empty_156",
-    "empty_157",
-    "empty_158",
-    "empty_159",
-    "empty_160",
-    "empty_161",
-    "empty_162",
-    "empty_163",
-    "empty_164",
-    "empty_165",
-    "empty_166",
-    "empty_167"
-   ],
+   "meshes": {
+    "empty_154": "body",
+    "empty_155": "mark",
+    "empty_156": "mark",
+    "empty_157": "mark",
+    "empty_158": "mark",
+    "empty_159": "mark",
+    "empty_160": "mark",
+    "empty_161": "mark",
+    "empty_162": "mark",
+    "empty_163": "mark",
+    "empty_164": "mark",
+    "empty_165": "mark",
+    "empty_166": "mark",
+    "empty_167": "mark"
+   },
    "bb": [
     [
      159.48,
@@ -1946,9 +1946,9 @@
    "y": -99.6,
    "z": -0.085,
    "back": true,
-   "meshes": [
-    "empty_168"
-   ],
+   "meshes": {
+    "empty_168": "body"
+   },
    "bb": [
     [
      140.87,
@@ -1972,9 +1972,9 @@
    "y": -93.52,
    "z": -0.085,
    "back": true,
-   "meshes": [
-    "empty_169"
-   ],
+   "meshes": {
+    "empty_169": "body"
+   },
    "bb": [
     [
      161.03,
@@ -1998,9 +1998,9 @@
    "y": -86.04,
    "z": -0.085,
    "back": true,
-   "meshes": [
-    "empty_170"
-   ],
+   "meshes": {
+    "empty_170": "body"
+   },
    "bb": [
     [
      157.97,
@@ -2024,9 +2024,9 @@
    "y": -89.1,
    "z": -0.085,
    "back": true,
-   "meshes": [
-    "empty_171"
-   ],
+   "meshes": {
+    "empty_171": "body"
+   },
    "bb": [
     [
      151.87,
@@ -2050,9 +2050,9 @@
    "y": -76.735,
    "z": -0.085,
    "back": true,
-   "meshes": [
-    "empty_172"
-   ],
+   "meshes": {
+    "empty_172": "body"
+   },
    "bb": [
     [
      146.657,
@@ -2076,28 +2076,28 @@
    "y": -73.24,
    "z": -0.085,
    "back": true,
-   "meshes": [
-    "empty_173",
-    "empty_174",
-    "empty_175",
-    "empty_176",
-    "empty_177",
-    "empty_178",
-    "empty_179",
-    "empty_180",
-    "empty_181",
-    "empty_182",
-    "empty_183",
-    "empty_184",
-    "empty_185",
-    "empty_186",
-    "empty_187",
-    "empty_188",
-    "empty_189",
-    "empty_190",
-    "empty_191",
-    "empty_192"
-   ],
+   "meshes": {
+    "empty_173": "body",
+    "empty_174": "lead",
+    "empty_175": "lead",
+    "empty_176": "lead",
+    "empty_177": "lead",
+    "empty_178": "lead",
+    "empty_179": "lead",
+    "empty_180": "mark",
+    "empty_181": "mark",
+    "empty_182": "mark",
+    "empty_183": "mark",
+    "empty_184": "mark",
+    "empty_185": "mark",
+    "empty_186": "mark",
+    "empty_187": "mark",
+    "empty_188": "mark",
+    "empty_189": "mark",
+    "empty_190": "mark",
+    "empty_191": "mark",
+    "empty_192": "mark"
+   },
    "bb": [
     [
      142.33,
@@ -2120,9 +2120,9 @@
    "y": -90.67,
    "z": -0.085,
    "back": true,
-   "meshes": [
-    "empty_193"
-   ],
+   "meshes": {
+    "empty_193": "body"
+   },
    "bb": [
     [
      162.99,
@@ -2145,9 +2145,9 @@
    "y": -73.965,
    "z": -0.085,
    "back": true,
-   "meshes": [
-    "empty_194"
-   ],
+   "meshes": {
+    "empty_194": "body"
+   },
    "bb": [
     [
      144.855,
@@ -2171,9 +2171,9 @@
    "y": -93.51,
    "z": -0.085,
    "back": true,
-   "meshes": [
-    "empty_195"
-   ],
+   "meshes": {
+    "empty_195": "body"
+   },
    "bb": [
     [
      159.598,
@@ -2197,9 +2197,9 @@
    "y": -82.29,
    "z": -0.085,
    "back": true,
-   "meshes": [
-    "empty_196"
-   ],
+   "meshes": {
+    "empty_196": "body"
+   },
    "bb": [
     [
      153.1,
@@ -2223,9 +2223,9 @@
    "y": -97.02,
    "z": -0.085,
    "back": true,
-   "meshes": [
-    "empty_197"
-   ],
+   "meshes": {
+    "empty_197": "body"
+   },
    "bb": [
     [
      160.16,
@@ -2249,9 +2249,9 @@
    "y": -90.57,
    "z": -0.085,
    "back": true,
-   "meshes": [
-    "empty_198"
-   ],
+   "meshes": {
+    "empty_198": "body"
+   },
    "bb": [
     [
      151.87,
@@ -2275,9 +2275,9 @@
    "y": -82.49,
    "z": -0.085,
    "back": true,
-   "meshes": [
-    "empty_199"
-   ],
+   "meshes": {
+    "empty_199": "body"
+   },
    "bb": [
     [
      157.46,
@@ -2301,9 +2301,9 @@
    "y": -92.01,
    "z": -0.085,
    "back": true,
-   "meshes": [
-    "empty_200"
-   ],
+   "meshes": {
+    "empty_200": "body"
+   },
    "bb": [
     [
      153.94,
@@ -2327,9 +2327,9 @@
    "y": -79.555,
    "z": -0.085,
    "back": true,
-   "meshes": [
-    "empty_201"
-   ],
+   "meshes": {
+    "empty_201": "body"
+   },
    "bb": [
     [
      159.309,
@@ -2352,27 +2352,27 @@
    "y": -97.14,
    "z": -0.085,
    "back": true,
-   "meshes": [
-    "empty_202",
-    "empty_203",
-    "empty_204",
-    "empty_205",
-    "empty_206",
-    "empty_207",
-    "empty_208",
-    "empty_209",
-    "empty_210",
-    "empty_211",
-    "empty_212",
-    "empty_213",
-    "empty_214",
-    "empty_215",
-    "empty_216",
-    "empty_217",
-    "empty_218",
-    "empty_219",
-    "empty_220"
-   ],
+   "meshes": {
+    "empty_202": "body",
+    "empty_203": "lead",
+    "empty_204": "lead",
+    "empty_205": "lead",
+    "empty_206": "lead",
+    "empty_207": "lead",
+    "empty_208": "mark",
+    "empty_209": "mark",
+    "empty_210": "mark",
+    "empty_211": "mark",
+    "empty_212": "mark",
+    "empty_213": "mark",
+    "empty_214": "mark",
+    "empty_215": "mark",
+    "empty_216": "mark",
+    "empty_217": "mark",
+    "empty_218": "mark",
+    "empty_219": "mark",
+    "empty_220": "mark"
+   },
    "bb": [
     [
      163.534,
@@ -2395,9 +2395,9 @@
    "y": -84.87,
    "z": -0.085,
    "back": true,
-   "meshes": [
-    "empty_221"
-   ],
+   "meshes": {
+    "empty_221": "body"
+   },
    "bb": [
     [
      155.92,
@@ -2421,9 +2421,9 @@
    "y": -82.46,
    "z": -0.085,
    "back": true,
-   "meshes": [
-    "empty_222"
-   ],
+   "meshes": {
+    "empty_222": "body"
+   },
    "bb": [
     [
      156.37,
@@ -2447,9 +2447,9 @@
    "y": -102.33,
    "z": -0.085,
    "back": true,
-   "meshes": [
-    "empty_223"
-   ],
+   "meshes": {
+    "empty_223": "body"
+   },
    "bb": [
     [
      144.95,
@@ -2473,9 +2473,9 @@
    "y": -95.16,
    "z": -0.085,
    "back": true,
-   "meshes": [
-    "empty_224"
-   ],
+   "meshes": {
+    "empty_224": "body"
+   },
    "bb": [
     [
      161.05,
@@ -2499,9 +2499,9 @@
    "y": -88.33,
    "z": -0.085,
    "back": true,
-   "meshes": [
-    "empty_225"
-   ],
+   "meshes": {
+    "empty_225": "body"
+   },
    "bb": [
     [
      151.88,
@@ -2525,9 +2525,9 @@
    "y": -89.28,
    "z": -1.785,
    "back": true,
-   "meshes": [
-    "empty_226"
-   ],
+   "meshes": {
+    "empty_226": "body"
+   },
    "bb": [
     [
      164.216,
@@ -2550,9 +2550,9 @@
    "y": -86.96,
    "z": -0.085,
    "back": true,
-   "meshes": [
-    "empty_227"
-   ],
+   "meshes": {
+    "empty_227": "body"
+   },
    "bb": [
     [
      155.91,
@@ -2576,9 +2576,9 @@
    "y": -82.29,
    "z": -0.085,
    "back": true,
-   "meshes": [
-    "empty_228"
-   ],
+   "meshes": {
+    "empty_228": "body"
+   },
    "bb": [
     [
      154.39,
@@ -2601,9 +2601,9 @@
    "y": -78.31,
    "z": -0.085,
    "back": true,
-   "meshes": [
-    "empty_229"
-   ],
+   "meshes": {
+    "empty_229": "body"
+   },
    "bb": [
     [
      152.832,
@@ -2626,9 +2626,9 @@
    "y": -97.05,
    "z": -0.085,
    "back": true,
-   "meshes": [
-    "empty_230"
-   ],
+   "meshes": {
+    "empty_230": "body"
+   },
    "bb": [
     [
      160.91,
@@ -2652,9 +2652,9 @@
    "y": -78.25,
    "z": -0.085,
    "back": true,
-   "meshes": [
-    "empty_231"
-   ],
+   "meshes": {
+    "empty_231": "body"
+   },
    "bb": [
     [
      155.41,
@@ -2678,22 +2678,22 @@
    "y": -80.03,
    "z": -0.085,
    "back": true,
-   "meshes": [
-    "empty_232",
-    "empty_233",
-    "empty_234",
-    "empty_235",
-    "empty_236",
-    "empty_237",
-    "empty_238",
-    "empty_239",
-    "empty_240",
-    "empty_241",
-    "empty_242",
-    "empty_243",
-    "empty_244",
-    "empty_245"
-   ],
+   "meshes": {
+    "empty_232": "body",
+    "empty_233": "mark",
+    "empty_234": "mark",
+    "empty_235": "mark",
+    "empty_236": "mark",
+    "empty_237": "mark",
+    "empty_238": "mark",
+    "empty_239": "mark",
+    "empty_240": "mark",
+    "empty_241": "mark",
+    "empty_242": "mark",
+    "empty_243": "mark",
+    "empty_244": "mark",
+    "empty_245": "mark"
+   },
    "bb": [
     [
      164.847,
@@ -2716,9 +2716,9 @@
    "y": -94.95,
    "z": -0.085,
    "back": true,
-   "meshes": [
-    "empty_246"
-   ],
+   "meshes": {
+    "empty_246": "body"
+   },
    "bb": [
     [
      166.83,
@@ -2742,9 +2742,9 @@
    "y": -97.025,
    "z": -0.085,
    "back": true,
-   "meshes": [
-    "empty_247"
-   ],
+   "meshes": {
+    "empty_247": "body"
+   },
    "bb": [
     [
      161.669,
@@ -2767,28 +2767,28 @@
    "y": -98.34,
    "z": -0.085,
    "back": true,
-   "meshes": [
-    "empty_248",
-    "empty_249",
-    "empty_250",
-    "empty_251",
-    "empty_252",
-    "empty_253",
-    "empty_254",
-    "empty_255",
-    "empty_256",
-    "empty_257",
-    "empty_258",
-    "empty_259",
-    "empty_260",
-    "empty_261",
-    "empty_262",
-    "empty_263",
-    "empty_264",
-    "empty_265",
-    "empty_266",
-    "empty_267"
-   ],
+   "meshes": {
+    "empty_248": "body",
+    "empty_249": "lead",
+    "empty_250": "lead",
+    "empty_251": "lead",
+    "empty_252": "lead",
+    "empty_253": "lead",
+    "empty_254": "lead",
+    "empty_255": "mark",
+    "empty_256": "mark",
+    "empty_257": "mark",
+    "empty_258": "mark",
+    "empty_259": "mark",
+    "empty_260": "mark",
+    "empty_261": "mark",
+    "empty_262": "mark",
+    "empty_263": "mark",
+    "empty_264": "mark",
+    "empty_265": "mark",
+    "empty_266": "mark",
+    "empty_267": "mark"
+   },
    "bb": [
     [
      142.16,
@@ -2811,9 +2811,9 @@
    "y": -97.03,
    "z": -0.085,
    "back": true,
-   "meshes": [
-    "empty_268"
-   ],
+   "meshes": {
+    "empty_268": "body"
+   },
    "bb": [
     [
      158.74,
@@ -2837,9 +2837,9 @@
    "y": -87.205,
    "z": -0.085,
    "back": true,
-   "meshes": [
-    "empty_269"
-   ],
+   "meshes": {
+    "empty_269": "body"
+   },
    "bb": [
     [
      151.715,
@@ -2863,9 +2863,9 @@
    "y": -94.94,
    "z": -0.085,
    "back": true,
-   "meshes": [
-    "empty_270"
-   ],
+   "meshes": {
+    "empty_270": "body"
+   },
    "bb": [
     [
      166.07,
@@ -2889,9 +2889,9 @@
    "y": -76.69,
    "z": -0.085,
    "back": true,
-   "meshes": [
-    "empty_271"
-   ],
+   "meshes": {
+    "empty_271": "body"
+   },
    "bb": [
     [
      141.15,
@@ -2915,9 +2915,9 @@
    "y": -91.28,
    "z": -0.085,
    "back": true,
-   "meshes": [
-    "empty_272"
-   ],
+   "meshes": {
+    "empty_272": "body"
+   },
    "bb": [
     [
      151.87,
@@ -2941,9 +2941,9 @@
    "y": -77.895,
    "z": -0.085,
    "back": true,
-   "meshes": [
-    "empty_273"
-   ],
+   "meshes": {
+    "empty_273": "body"
+   },
    "bb": [
     [
      161.58,
@@ -2967,22 +2967,22 @@
    "y": -71.9,
    "z": -0.085,
    "back": true,
-   "meshes": [
-    "empty_274",
-    "empty_275",
-    "empty_276",
-    "empty_277",
-    "empty_278",
-    "empty_279",
-    "empty_280",
-    "empty_281",
-    "empty_282",
-    "empty_283",
-    "empty_284",
-    "empty_285",
-    "empty_286",
-    "empty_287"
-   ],
+   "meshes": {
+    "empty_274": "body",
+    "empty_275": "mark",
+    "empty_276": "mark",
+    "empty_277": "mark",
+    "empty_278": "mark",
+    "empty_279": "mark",
+    "empty_280": "mark",
+    "empty_281": "mark",
+    "empty_282": "mark",
+    "empty_283": "mark",
+    "empty_284": "mark",
+    "empty_285": "mark",
+    "empty_286": "mark",
+    "empty_287": "mark"
+   },
    "bb": [
     [
      146.97,
@@ -3005,9 +3005,9 @@
    "y": -97.05,
    "z": -0.085,
    "back": true,
-   "meshes": [
-    "empty_288"
-   ],
+   "meshes": {
+    "empty_288": "body"
+   },
    "bb": [
     [
      144.58,
@@ -3031,9 +3031,9 @@
    "y": -78.29,
    "z": -0.085,
    "back": true,
-   "meshes": [
-    "empty_289"
-   ],
+   "meshes": {
+    "empty_289": "body"
+   },
    "bb": [
     [
      151.72,

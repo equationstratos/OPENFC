@@ -243,13 +243,46 @@ def segment(solids, comps):
     i = n
     for j in range(m, 0, -1):
         k = back[j][i]
-        comps[j - 1]["meshes"] = [s["name"] for s in solids[k:i]]
+        comps[j - 1]["meshes"] = roles(solids[k:i])
         comps[j - 1]["bb"] = [
             [round(min(s["min"][a] for s in solids[k:i]), 3) for a in range(3)],
             [round(max(s["max"][a] for s in solids[k:i]), 3) for a in range(3)],
         ]
         i = k
     return best[m][n]
+
+
+def roles(group):
+    """
+    Label each solid of one component so the viewer can paint it like the real
+    part: an epoxy body and its tinned leads are not the same colour.
+
+    KiCad's own colours cannot tell them apart -- it paints almost everything
+    the same flat grey -- but the geometry can. The package body is by far the
+    largest solid; leads and contacts are small; and moulded-in markings are
+    exported as zero-thickness sheets on the surface of the housing.
+    """
+    volume = lambda s: max(
+        (s["max"][0] - s["min"][0]) * (s["max"][1] - s["min"][1]) * (s["max"][2] - s["min"][2]),
+        0.0,
+    )
+    thinnest = lambda s: min(s["max"][a] - s["min"][a] for a in range(3))
+
+    body = max(group, key=volume)
+    out = {}
+    for s in group:
+        if s is body:
+            role = "body"
+        elif thinnest(s) < 0.02:
+            role = "mark"
+        elif volume(s) >= 0.45 * volume(body):
+            # a second solid nearly as big as the body is a separate part of the
+            # same component -- the steel cage over the microSD's plastic frame
+            role = "shell"
+        else:
+            role = "lead"
+        out[s["name"]] = role
+    return out
 
 
 # --------------------------------------------------------------------------

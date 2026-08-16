@@ -1,16 +1,16 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="en">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <title>OpenFC — Guide d'assemblage</title>
+  <title>OpenFC — Build Guide</title>
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%230f3b2b'/%3E%3Crect x='9' y='9' width='14' height='14' rx='2' fill='%23cdd6dc'/%3E%3C/svg%3E">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
   <style>
     :root{
       --cyan:#00A7E1; --cyan-dim:#0a6d99;
-      --accent:#ff7a66;            /* la couleur du composant en cours de pose */
+      --accent:#ff7a66;            /* the part currently being placed */
       --accent-soft:#ffb3a5;
       --ok:#37e0a0;
       --ink:#eaf4fb; --dim:#9fc0d6; --faint:#6f96b1;
@@ -23,7 +23,7 @@
     canvas{display:block;touch-action:none}
     #viewport{position:fixed;inset:0}
 
-    /* ---------- bandeau ---------- */
+    /* ---------- header ---------- */
     #top{position:fixed;top:0;left:0;right:0;z-index:5;padding:14px 18px 0;
       background:linear-gradient(180deg,#0b1622f2 55%,#0b162200);pointer-events:none}
     #topInner{display:flex;align-items:center;gap:14px;max-width:1240px;margin:0 auto}
@@ -40,13 +40,13 @@
     #barFill{height:100%;width:0;border-radius:4px;
       background:linear-gradient(90deg,var(--cyan),var(--ok));transition:width .45s cubic-bezier(.4,0,.2,1)}
 
-    /* ---------- fiche ---------- */
+    /* ---------- info card ---------- */
     #card{position:fixed;left:18px;bottom:18px;z-index:6;width:420px;max-width:calc(100vw - 36px);
       background:#0e2236f2;backdrop-filter:blur(14px);
       border:1px solid var(--line);border-left:4px solid var(--accent);
       padding:19px 20px 17px;border-radius:16px;box-shadow:0 18px 44px #0009;
       max-height:calc(100vh - 190px);overflow-y:auto;overscroll-behavior:contain;
-      /* estompe la dernière ligne : indique que la fiche continue plus bas */
+      /* fade the last line so it reads as "there is more below" */
       mask-image:linear-gradient(180deg,#000 calc(100% - 26px),transparent);
       -webkit-mask-image:linear-gradient(180deg,#000 calc(100% - 26px),transparent)}
     #card::-webkit-scrollbar{width:6px}
@@ -67,7 +67,7 @@
       margin-top:11px;line-height:1.65;word-break:break-word;border-top:1px solid #17334c;padding-top:9px}
     #cRefs i{color:#547d99;font-style:normal}
 
-    /* ---------- commandes ---------- */
+    /* ---------- controls ---------- */
     #ctl{position:fixed;right:18px;bottom:18px;z-index:6;display:flex;gap:8px;align-items:center}
     #tools{position:fixed;right:18px;top:84px;z-index:6;display:flex;flex-direction:column;gap:7px;align-items:flex-end}
     .btn{border:1px solid #244863;background:#102a40e0;backdrop-filter:blur(8px);color:var(--ink);
@@ -84,7 +84,7 @@
       background:#102a40cc;border:1px solid #2a5b82;color:#8fd0f2;backdrop-filter:blur(8px);
       pointer-events:none;transition:.25s}
 
-    /* ---------- étiquettes 3D ---------- */
+    /* ---------- 3D callout labels ---------- */
     #labels{position:fixed;inset:0;z-index:4;pointer-events:none;overflow:hidden}
     #leaders{position:absolute;inset:0;width:100%;height:100%}
     .lbl{position:absolute;transform:translate(-50%,-50%);white-space:nowrap;
@@ -124,43 +124,43 @@
     <div id="topInner">
       <div id="logo">⬡</div>
       <div id="ttl">
-        <b>OpenFC — Guide d'assemblage</b>
-        <span>Contrôleur de vol open source · un sous-ensemble à la fois</span>
+        <b>OpenFC — Build Guide</b>
+        <span>Open-source flight controller · one subsystem at a time</span>
       </div>
-      <div id="prog"><b id="pCount">1/14</b><span>ÉTAPES</span></div>
+      <div id="prog"><b id="pCount">1/14</b><span>BUILD STEPS</span></div>
     </div>
     <div id="bar"><div id="barFill"></div></div>
   </div>
 
-  <div id="face">FACE AVANT</div>
+  <div id="face">FRONT SIDE</div>
 
   <div id="tools">
-    <button class="btn sm" id="btnXray" title="Rendre le PCB translucide">◍ Rayons X</button>
-    <button class="btn sm" id="btnSpin" title="Rotation automatique">↻ Rotation</button>
+    <button class="btn sm" id="btnXray" title="Make the PCB translucent">◍ X-ray</button>
+    <button class="btn sm" id="btnSpin" title="Auto-rotate">↻ Spin</button>
   </div>
 
   <div id="card">
     <div id="cHead">
       <div id="cIcon">⬡</div>
       <div>
-        <h3 id="cTitle">Chargement…</h3>
+        <h3 id="cTitle">Loading…</h3>
         <div id="cWhat"></div>
       </div>
     </div>
-    <p id="cBlurb">Lecture du modèle 3D et de la nomenclature.</p>
+    <p id="cBlurb">Reading the 3D model and the bill of materials.</p>
     <div id="cTags"></div>
     <div id="cRefs"></div>
   </div>
 
   <div id="ctl">
-    <button class="btn sm" id="btnFlip">⟲ Retourner</button>
-    <button class="btn sm" id="btnReframe">⊙ Recadrer</button>
-    <button class="btn" id="btnBack" disabled>← Précédent</button>
-    <button class="btn pri" id="btnNext">Suivant →</button>
+    <button class="btn sm" id="btnFlip">⟲ Flip</button>
+    <button class="btn sm" id="btnReframe">⊙ Re-frame</button>
+    <button class="btn" id="btnBack" disabled>← Back</button>
+    <button class="btn pri" id="btnNext">Next →</button>
   </div>
 
-  <div id="hint">Glisser pour orbiter · molette pour zoomer · ← → pour naviguer</div>
-  <div id="load">Chargement du modèle…</div>
+  <div id="hint">Drag to orbit · scroll to zoom · ← → to step</div>
+  <div id="load">Loading model…</div>
 
 <script type="module">
 import * as THREE from 'three';
@@ -172,297 +172,288 @@ import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 const ASSETS = './assets/openfc-visualizer';
 
 /* ==========================================================================
-   Le contenu du guide.
+   Guide content.
 
-   `group` renvoie au champ `step` de parts-map.json : c'est lui qui décide
-   quels composants s'allument à cette étape. `labels` sont les repères posés
-   dans la vue 3D — volontairement peu nombreux, pour rester lisibles.
+   `group` refers to the `step` field in parts-map.json: that is what decides
+   which components light up at this step. `labels` are the callouts pinned in
+   the 3D view — deliberately few of them, so they stay readable.
    ========================================================================== */
 const STEPS = [
   {
     group:null, icon:'▢',
-    title:"Quatre trous et beaucoup de cuivre",
-    what:"Le circuit imprimé — le squelette",
-    html:`Tout commence par un carré de fibre de verre de <b>37,9 mm de côté</b>, épais
-      de <b>0,94 mm</b>. Les quatre trous de <b>Ø4 mm</b> ne sont pas placés au hasard :
-      leurs centres forment un carré de <b>30,5 × 30,5 mm</b>, le standard de fixation
-      qu'utilisent la quasi-totalité des drones de 5 pouces et plus. Ils reçoivent des
-      <b>silentblocs</b> en caoutchouc, et ce détail est électronique autant que mécanique :
-      ils filtrent les vibrations du châssis avant qu'elles n'atteignent le gyroscope.
-      À l'intérieur du stratifié, le cuivre est empilé en couches — les faces externes
-      portent les pistes, les couches internes sont des <b>plans pleins</b>. Ce plan de
-      masse est la pièce la plus importante de la carte alors qu'il n'apparaît sur aucune
-      nomenclature : il sert de <em>chemin de retour</em> à tous les courants, et de
-      <em>blindage</em> entre les commutations de l'alimentation et le capteur.
-      Les composants se répartissent sur les <b>deux faces</b> : 39 devant, 72 derrière.`,
-    tags:['PCB','2 FACES'],
-    refs:'30,5 × 30,5 mm · Ø4,0 mm · ép. 0,94 mm · 37,9 × 37,9 mm'
+    title:"Four holes and a lot of copper",
+    what:"The bare PCB — the skeleton",
+    html:`It starts as a square of glass-reinforced epoxy, <b>37.9 mm a side</b> and
+      <b>0.94 mm</b> thick. The four <b>Ø4 mm</b> holes are not placed casually: their
+      centres form a <b>30.5 × 30.5 mm</b> square, the mounting standard that nearly
+      every 5-inch-and-up quad uses. They take rubber <b>soft-mounts</b>, and that
+      detail is as electrical as it is mechanical — they damp frame vibration before
+      it ever reaches the gyro. Inside the laminate, copper is stacked in layers: the
+      outer faces carry the traces, the inner ones are <b>solid planes</b>. That ground
+      plane is the most important part on the board even though it appears on no bill
+      of materials — it is the <em>return path</em> for every current, and the
+      <em>shield</em> between the switching regulators and the sensor. Parts sit on
+      <b>both sides</b>: 39 on the front, 72 on the back.`,
+    tags:['PCB','BOTH SIDES'],
+    refs:'30.5 × 30.5 mm · Ø4.0 mm · 0.94 mm thick · 37.9 × 37.9 mm'
   },
   {
     group:'rails', icon:'⚡',
-    title:"Deux hacheurs, deux rails",
-    what:"Les convertisseurs à découpage — l'alimentation",
-    html:`La batterie d'un drone n'est pas une source propre : sur une 4S elle tombe de
-      <b>16,8 V à 13 V</b> dès que vous mettez les gaz, avec des pics à chaque commutation
-      des moteurs. Rien de numérique ne supporte ça. Deux <b>convertisseurs abaisseurs</b>
-      s'en chargent — <b>U6</b> et <b>U16</b>, deux boîtiers SOT-23-6 de 2,9 × 1,6 mm.
-      Le principe : un transistor interne <em>hache</em> la tension d'entrée à quelques
-      centaines de kilohertz. Chaque impulsion pousse du courant dans une <b>bobine</b> —
-      <b>L2</b> et <b>L3</b>, deux cubes blindés de 3 × 3 mm — qui <em>stocke l'énergie
-      dans un champ magnétique</em> puis la restitue pendant que le transistor est bloqué.
-      Comme on transfère l'énergie au lieu d'en brûler, le rendement dépasse <b>90 %</b>.
-      Les condensateurs 0805 et 0603 (C22/C23, C26/C27) encadrent chaque bobine : ils
-      fournissent les pics de courant que la piste d'entrée, avec son inductance parasite,
-      ne peut pas délivrer assez vite. Chaque étage a son témoin — <b>D4</b> et <b>D5</b>,
-      posées juste en face sur l'autre face de la carte.`,
-    tags:['PUISSANCE','FACE ARRIÈRE'],
-    labels:[['L2','ÉTAGE 1 · bobine + U6'],['L3','ÉTAGE 2 · bobine + U16']],
+    title:"Two choppers, two rails",
+    what:"The buck converters — the power stage",
+    html:`A drone battery is not a clean supply: a 4S pack sags from <b>16.8 V to 13 V</b>
+      the moment you punch the throttle, with a spike on every motor commutation.
+      Nothing digital tolerates that. Two <b>step-down converters</b> handle it —
+      <b>U6</b> and <b>U16</b>, SOT-23-6 packages 2.9 × 1.6 mm. The trick: a transistor
+      inside <em>chops</em> the input at a few hundred kilohertz. Each pulse pushes
+      current into an <b>inductor</b> — <b>L2</b> and <b>L3</b>, two 3 × 3 mm shielded
+      blocks — which <em>stores the energy in a magnetic field</em> and hands it back
+      while the transistor is off. Because the energy is moved rather than burned,
+      efficiency runs past <b>90 %</b>. The 0805 and 0603 capacitors (C22/C23, C26/C27)
+      flank each inductor: they supply the current spikes that the input trace, with
+      its own parasitic inductance, cannot deliver fast enough. Each stage has its own
+      tell-tale — <b>D4</b> and <b>D5</b>, mounted directly opposite on the other side.`,
+    tags:['POWER','BACK SIDE'],
+    labels:[['L2','STAGE 1 · coil + U6'],['L3','STAGE 2 · coil + U16']],
     refs:'U6 U16 · L2 L3 · C22 C23 C26 C27 · D4 D5'
   },
   {
     group:'ldo', icon:'⛉',
-    title:"Quand on préfère perdre de l'énergie",
-    what:"Les régulateurs linéaires — la propreté",
-    html:`Un hacheur est efficace, mais <b>bruyant</b> : à chaque commutation il injecte
-      des parasites sur son rail. Pour un gyroscope MEMS, qui mesure des variations de
-      capacité de l'ordre du <b>femtofarad</b>, ce bruit se retrouve directement dans la
-      mesure. D'où <b>U15</b>, un WSON-6 de 2 × 2 mm posé littéralement contre la centrale
-      inertielle. Un <b>LDO</b> ne découpe rien : c'est un transistor maintenu en zone
-      linéaire par une boucle de contre-réaction, une <em>résistance variable</em> ajustée
-      en permanence pour tenir la sortie à la bonne valeur. Aucun bruit de commutation —
-      mais tout ce qu'il ne laisse pas passer part <em>en chaleur</em>. C'est le compromis
-      assumé : on gaspille quelques dizaines de milliwatts pour gagner un rail propre.
-      <b>U7</b>, boîtier identique sur l'autre face, alimente une autre section. Règle de
-      montage : le condensateur de sortie doit toucher la broche — ici C31 et C42 sont à
-      moins d'un millimètre.`,
-    tags:['PUISSANCE','2 FACES'],
-    labels:[['U15','LDO GYRO'],['U7','LDO']],
+    title:"When wasting energy is the point",
+    what:"The linear regulators — the clean rails",
+    html:`A switcher is efficient but <b>noisy</b>: every commutation injects hash onto
+      its rail. To a MEMS gyroscope, which resolves capacitance changes on the order of
+      a <b>femtofarad</b>, that noise lands straight in the measurement. Hence
+      <b>U15</b>, a 2 × 2 mm WSON-6 placed literally against the inertial sensor.
+      An <b>LDO</b> chops nothing: it is a transistor held in its linear region by a
+      feedback loop — a <em>variable resistor</em> trimmed continuously to hold the
+      output where it belongs. No switching noise at all — but everything it does not
+      pass leaves <em>as heat</em>. That is the deliberate trade: throw away a few tens
+      of milliwatts to buy a quiet rail. <b>U7</b>, the same package on the other side,
+      feeds a different section. The layout rule: the output capacitor has to touch the
+      pin — C31 and C42 are less than a millimetre away.`,
+    tags:['POWER','BOTH SIDES'],
+    labels:[['U15','GYRO LDO'],['U7','LDO']],
     refs:'U7 U15 · C30 C31 C32 C42'
   },
   {
     group:'mcu', icon:'▦',
-    title:"Quatre-vingts pattes sous dix millimètres",
-    what:"Le microcontrôleur RP2354B",
-    html:`Le composant central, <b>U2</b>, est un <b>QFN-80</b> de 10 × 10 mm au
-      <b>pas de 0,40 mm</b> : quatre-vingts contacts sur le pourtour, plus un
-      <b>pavé thermique de 3,4 mm</b> au centre qui évacue la chaleur vers le plan de
-      masse. Dedans : deux cœurs <b>Cortex-M33 à 150 MHz</b>, de la mémoire vive, et
-      <b>4 Mo de flash empilés dans le même boîtier</b> — c'est précisément ce qui
-      distingue le RP2354B du RP2350B nu. Un QFN n'a <em>aucune patte visible</em> :
-      les contacts sont sous le corps, la brasure se fait à l'aveugle et se contrôle
-      aux rayons X. Autour de lui, une trentaine de composants minuscules. Chaque broche
-      d'alimentation reçoit son <b>condensateur de découplage</b> à moins de deux
-      millimètres, parce qu'un cœur qui passe de 5 à 300 mA en une nanoseconde vide la
-      piste avant que le régulateur ait le temps de réagir : le condensateur est le
-      réservoir local qui tient pendant ces quelques nanosecondes. Retournez la carte —
-      une colonne entière de 0201 est montée <em>au dos, sous le boîtier</em>, reliée
-      par des vias traversants. C'est le chemin le plus court qui existe.`,
-    tags:['CALCUL','2 FACES'],
+    title:"Eighty pins under ten millimetres",
+    what:"The RP2354B microcontroller",
+    html:`The part at the centre, <b>U2</b>, is a <b>QFN-80</b> measuring 10 × 10 mm on a
+      <b>0.40 mm pitch</b>: eighty contacts around the perimeter plus a <b>3.4 mm
+      thermal pad</b> in the middle that dumps heat into the ground plane. Inside: two
+      <b>Cortex-M33 cores at 150 MHz</b>, RAM, and <b>4 MB of flash stacked in the same
+      package</b> — precisely what separates the RP2354B from a bare RP2350B. A QFN has
+      <em>no visible leads</em>: the contacts live under the body, the joints are made
+      blind, and they are inspected by X-ray. Around it sit about thirty tiny parts.
+      Every supply pin gets its own <b>decoupling capacitor</b> within two millimetres,
+      because a core swinging from 5 to 300 mA in a nanosecond drains the trace long
+      before the regulator can respond: the capacitor is the local reservoir that
+      carries those few nanoseconds. Flip the board over — a whole column of 0201s is
+      mounted <em>on the back, underneath the package</em>, tied through vias. It is the
+      shortest path there is.`,
+    tags:['COMPUTE','BOTH SIDES'],
     labels:[['U2','RP2354B · QFN-80']],
-    refs:'U2 + 31 passifs · C1…C17 R1…R30 Q1 Q2'
+    refs:'U2 + 31 passives · C1…C17 R1…R30 Q1 Q2'
   },
   {
     group:'coresmps', icon:'◎',
-    title:"Une bobine rien que pour le cœur",
-    what:"L'alimentation interne du RP2350",
-    html:`Détail que peu de cartes rendent visible : le RP2350 embarque <b>son propre
-      convertisseur à découpage</b> pour alimenter son cœur en 1,1 V, et ce convertisseur
-      a besoin d'une <b>bobine externe</b>. C'est <b>L1</b> — 3,3 µH dans un boîtier 2016
-      (2,0 × 1,6 mm), posée à trois millimètres du microcontrôleur, avec <b>C19</b> et
-      <b>C20</b> pour l'entrée et la sortie. La contrainte est celle de tout hacheur :
-      la <em>boucle de commutation</em> formée par la bobine, le condensateur et les
-      broches du circuit doit être la plus petite possible. Chaque millimètre carré de
-      surface qu'elle enferme est une antenne — et cette antenne rayonnerait à quelques
-      centimètres du gyroscope et du récepteur radio. Ici la boucle fait moins de cinq
-      millimètres de tour.`,
-    tags:['CALCUL','FACE AVANT'],
-    labels:[['L1','SMPS CŒUR · 3,3 µH']],
+    title:"An inductor just for the core",
+    what:"The RP2350's built-in regulator",
+    html:`A detail few boards make visible: the RP2350 carries <b>its own switching
+      regulator</b> for the 1.1 V core, and that regulator needs an <b>external
+      inductor</b>. This is <b>L1</b> — 3.3 µH in a 2016 package (2.0 × 1.6 mm), sitting
+      three millimetres from the chip with <b>C19</b> and <b>C20</b> for input and
+      output. The constraint is the one every switcher has: the <em>commutation loop</em>
+      formed by the inductor, the capacitor and the chip's pins must be as small as
+      possible. Every square millimetre it encloses is an antenna — and this antenna
+      would be radiating a couple of centimetres from the gyro and the radio link. Here
+      the loop measures under five millimetres around.`,
+    tags:['COMPUTE','FRONT SIDE'],
+    labels:[['L1','CORE SMPS · 3.3 µH']],
     refs:'L1 · C9 C19 C20 · R10 R11'
   },
   {
     group:'clock', icon:'◈',
-    title:"Un caillou qui vibre",
-    what:"Le quartz — la référence de temps",
-    html:`<b>X1</b> est un quartz quatre plots de 2,5 × 2,0 mm. À l'intérieur, une lamelle
-      de quartz taillée qui <b>vibre mécaniquement</b> dès qu'on lui applique une tension —
-      l'effet piézoélectrique — à une fréquence fixée par sa découpe, ici <b>12 MHz</b>,
-      stable à quelques dizaines de parties par million. La <b>PLL</b> du microcontrôleur
-      multiplie ensuite ce 12 MHz pour fabriquer les 150 MHz du cœur et l'horloge USB.
-      Sans lui, pas d'USB du tout : le protocole tolère <b>±0,25 %</b> d'écart, très en
-      dessous de ce que peut tenir un oscillateur RC interne. Regardez où il est monté :
-      <em>au dos, exactement sous le microcontrôleur</em>. Ce n'est pas de la place
-      perdue, c'est le trajet le plus court possible entre la lamelle et ses deux broches —
-      quelques millimètres de piste et deux vias. Un signal d'horloge qui traverse la
-      carte ramasse du bruit et en rayonne ; on le garde donc court, et entouré de masse.`,
-    tags:['HORLOGE','FACE ARRIÈRE'],
-    labels:[['X1','QUARTZ 12 MHz']],
+    title:"A rock that vibrates",
+    what:"The crystal — the time reference",
+    html:`<b>X1</b> is a four-pad crystal, 2.5 × 2.0 mm. Inside is a sliver of quartz cut
+      to shape that <b>vibrates mechanically</b> the moment a voltage is applied to it —
+      the piezoelectric effect — at a frequency fixed by that cut, here <b>12 MHz</b>,
+      stable to a few tens of parts per million. The microcontroller's <b>PLL</b> then
+      multiplies it up to the 150 MHz core clock and the USB clock. Without it there is
+      no USB at all: the protocol allows <b>±0.25 %</b>, far tighter than any internal
+      RC oscillator holds. Look where it is mounted: <em>on the back, directly beneath
+      the microcontroller</em>. That is not wasted real estate, it is the shortest
+      possible run between the crystal and its two pins — a few millimetres of trace and
+      two vias. A clock line that crosses the board picks up noise and radiates it, so
+      you keep it short and surround it with ground.`,
+    tags:['CLOCK','BACK SIDE'],
+    labels:[['X1','12 MHz CRYSTAL']],
     refs:'X1 · C8 C11 C18'
   },
   {
     group:'imu', icon:'◉',
-    title:"Six axes dans trois millimètres",
-    what:"La centrale inertielle BMI270 — l'oreille interne",
-    html:`<b>U9</b>, boîtier <b>LGA-14 de 3,0 × 2,5 mm</b>, est le seul composant sans
-      lequel un drone ne peut pas voler. Il contient deux capteurs <b>MEMS</b> gravés
-      dans le silicium. Le <b>gyromètre</b> : des masses microscopiques entretenues en
-      vibration, dont on mesure la déviation provoquée par la <em>force de Coriolis</em>
-      dès que la carte tourne — c'est la vitesse de rotation, sur trois axes, plusieurs
-      milliers de fois par seconde. L'<b>accéléromètre</b> : trois masses suspendues sur
-      des ressorts de silicium, dont on lit le déplacement comme une variation de
-      capacité. Le gyromètre est rapide mais il <em>dérive</em> ; l'accéléromètre est
-      bruyant mais il sait où est le bas. La fusion des deux donne une attitude à la fois
-      rapide et stable. C'est la mesure du gyromètre que la boucle PID compare à la
-      position de vos manches, à chaque cycle. Deux règles de montage : le placer
-      <b>près du centre de la carte</b>, pour qu'il lise la rotation et non les
-      accélérations centrifuges, et lui donner <b>son propre régulateur</b> — c'est
-      U15, à un millimètre de là.`,
-    tags:['CAPTEUR','FACE AVANT'],
+    title:"Six axes in three millimetres",
+    what:"The BMI270 IMU — the inner ear",
+    html:`<b>U9</b>, an <b>LGA-14 measuring 3.0 × 2.5 mm</b>, is the one part without
+      which a drone cannot fly. It holds two <b>MEMS</b> sensors etched into silicon.
+      The <b>gyroscope</b>: microscopic masses driven into vibration, whose deflection
+      under the <em>Coriolis force</em> is measured the instant the board rotates — that
+      is angular rate, on three axes, thousands of times a second. The
+      <b>accelerometer</b>: three masses hung on silicon springs, their displacement read
+      as a change in capacitance. The gyro is fast but it <em>drifts</em>; the
+      accelerometer is noisy but it knows which way is down. Fusing the two yields an
+      attitude that is both quick and stable. It is the gyro reading that the PID loop
+      compares against your stick position, every single cycle. Two mounting rules: put
+      it <b>near the centre of the board</b> so it reads rotation rather than centrifugal
+      acceleration, and give it <b>its own regulator</b> — that is U15, a millimetre
+      away.`,
+    tags:['SENSOR','FRONT SIDE'],
     labels:[['U9','BMI270 · LGA-14']],
-    refs:'U9 · C33 C34 · SPI vers U2'
+    refs:'U9 · C33 C34 · SPI to U2'
   },
   {
     group:'boot', icon:'⏻',
-    title:"Le bouton qui transforme la carte en clé USB",
-    what:"Le contact BOOTSEL",
-    html:`<b>U1</b> est un simple contact fugitif à quatre broches, 3 × 2 mm. Sa fonction
-      tient en une phrase : forcer l'état d'une broche <em>au moment précis où le
-      microcontrôleur démarre</em>. Le RP2350 lit cette broche à la mise sous tension ;
-      si elle est au bon niveau, il <b>n'exécute pas le programme</b> en flash et démarre
-      à la place sa ROM interne. La carte apparaît alors sur l'ordinateur comme une
-      <b>clé USB</b> : on y glisse un fichier <b>.uf2</b> et le firmware est écrit.
-      C'est le filet de sécurité du projet. Quel que soit l'état du logiciel embarqué —
-      même complètement corrompu, même bloqué au premier cycle — un firmware se répare
-      avec un bouton et un glisser-déposer, sans programmateur, sans souder un seul fil.`,
-    tags:['MISE EN ŒUVRE','FACE AVANT'],
-    labels:[['U1','BOUTON BOOT']],
+    title:"The button that turns the board into a flash drive",
+    what:"The BOOTSEL contact",
+    html:`<b>U1</b> is nothing more than a four-pin momentary switch, 3 × 2 mm. Its job
+      fits in one sentence: force the state of a pin <em>at the exact moment the
+      microcontroller starts</em>. The RP2350 samples that pin at power-up; if it is
+      held at the right level, the chip <b>does not run the program</b> in flash and
+      boots its internal ROM instead. The board then appears on your computer as a
+      <b>USB mass-storage device</b>: you drag a <b>.uf2</b> file onto it and the
+      firmware is written. This is the project's safety net. Whatever state the embedded
+      software is in — corrupted outright, hung on the first cycle — the firmware is
+      recoverable with one button and a drag-and-drop, no programmer, not a wire
+      soldered.`,
+    tags:['BRING-UP','FRONT SIDE'],
+    labels:[['U1','BOOT BUTTON']],
     refs:'U1 · C21 R9'
   },
   {
     group:'status', icon:'✳',
-    title:"Cinq LED, cinq réponses",
-    what:"Les témoins d'état",
-    html:`Cinq LED en boîtier <b>0402</b> — un millimètre sur un demi. Chacune est en
-      série avec sa <b>résistance de limitation</b>, et c'est la seule façon correcte
-      de câbler une LED : une diode a une tension de seuil quasi fixe, si vous la
-      branchez directement sur un rail c'est le <em>courant</em> qui s'emballe et la
-      détruit. La résistance impose ce courant. Les paires sont visibles à l'œil dans
-      le modèle : <b>D9/R39</b>, <b>D1/R16</b>, <b>D7/R28</b>, alignées en colonne à
-      côté du microcontrôleur. Les deux autres, <b>D4</b> et <b>D5</b>, sont dans les
-      coins, chacune en face d'un convertisseur — ce sont les témoins de rail.
-      Sur une carte finie, ces cinq points lumineux sont le premier outil de
-      diagnostic : ils disent en une seconde si l'alimentation monte, si le firmware
-      tourne, et si la liaison est établie — avant même de brancher un ordinateur.`,
-    tags:['DIAGNOSTIC','FACE AVANT'],
-    labels:[['D1','LED + RÉSISTANCE']],
+    title:"Five LEDs, five answers",
+    what:"The status indicators",
+    html:`Five LEDs in <b>0402</b> packages — one millimetre by half. Each one sits in
+      series with its own <b>current-limiting resistor</b>, and that is the only correct
+      way to wire an LED: a diode has a nearly fixed forward voltage, so connect one
+      straight across a rail and it is the <em>current</em> that runs away and destroys
+      it. The resistor sets that current. The pairs are visible by eye in the model:
+      <b>D9/R39</b>, <b>D1/R16</b>, <b>D7/R28</b>, in a column beside the
+      microcontroller. The other two, <b>D4</b> and <b>D5</b>, are out in the corners,
+      each facing one of the converters — those are the rail indicators. On a finished
+      board these five points of light are the first diagnostic you have: in one second
+      they tell you whether the supply came up, whether the firmware is running and
+      whether the link is alive — before you have plugged in a computer at all.`,
+    tags:['DIAGNOSTICS','FRONT SIDE'],
+    labels:[['D1','LED + RESISTOR']],
     refs:'D1 D7 D9 · R16 R28 R39 · C10'
   },
   {
     group:'sense', icon:'∿',
-    title:"Le coin discret",
-    what:"L'étage analogique — mesure et protection",
-    html:`Dans l'angle arrière droit, un groupe compact et facile à manquer : <b>U11</b>
-      (SOT-23-5), <b>U10</b> (X2SON-6, 1,0 × 0,8 mm), <b>U12</b> (X2SON-4, 0,8 × 0,8 mm),
-      la diode <b>D8</b>, et une dizaine de résistances 0201 dont deux séries de trois
-      parfaitement alignées. Ces alignements sont signés : trois résistances en file,
-      c'est la géométrie d'un <b>pont diviseur</b>. Le principe est élémentaire et
-      omniprésent — deux résistances en série entre la tension à mesurer et la masse,
-      et le point milieu, qui délivre une fraction fixe de cette tension, part vers un
-      <b>convertisseur analogique-numérique</b> du microcontrôleur. C'est exactement
-      comme ça qu'un OSD affiche « 15,8 V » : il ne mesure pas la batterie, il mesure
-      un dixième de la batterie et multiplie par dix.
-      <br><br><i style="color:#7fa8c4">Sur ce qui est certain : le modèle exporté donne
-      le boîtier, le repère et la position — pas la référence du silicium. Le rôle
-      analogique de service se lit dans la géométrie ; le numéro de pièce, non.</i>`,
-    tags:['ANALOGIQUE','FACE ARRIÈRE'],
+    title:"The quiet corner",
+    what:"The analog service block — sensing and protection",
+    html:`In the back right corner sits a compact group that is easy to miss:
+      <b>U11</b> (SOT-23-5), <b>U10</b> (X2SON-6, 1.0 × 0.8 mm), <b>U12</b> (X2SON-4,
+      0.8 × 0.8 mm), the diode <b>D8</b>, and a dozen 0201 resistors including two
+      perfectly aligned rows of three. Those alignments are a signature: three resistors
+      in a file is the geometry of a <b>voltage divider</b>. The principle is elementary
+      and everywhere — two resistors in series between the voltage you want to measure
+      and ground, with the midpoint, carrying a fixed fraction of it, running off to an
+      <b>analog-to-digital converter</b> on the microcontroller. That is exactly how an
+      OSD shows you "15.8 V": it never measures the battery, it measures a tenth of the
+      battery and multiplies by ten.
+      <br><br><i style="color:#7fa8c4">On what is certain here: the exported model gives
+      the package, the designator and the position — not the part number. The analog
+      service role is legible in the geometry; the silicon inside is not.</i>`,
+    tags:['ANALOG','BACK SIDE'],
     labels:[['U11','SOT-23-5'],['U10','X2SON-6']],
     refs:'U10 U11 U12 D8 · R31…R35 · C36…C40'
   },
   {
     group:'usb', icon:'⇄',
-    title:"Seize contacts et deux résistances",
-    what:"Le port USB-C",
-    html:`<b>USB1</b> est une prise <b>USB-C 16 contacts</b> soudée en bord de carte —
-      le composant le plus haut du montage, 3,9 mm. Deux détails valent le détour.
-      D'abord la <b>réversibilité</b> : la prise est symétrique, donc chaque fonction
-      existe en double, et la carte doit <em>découvrir dans quel sens</em> le câble est
-      branché. C'est le rôle des broches <b>CC1</b> et <b>CC2</b>, et de <b>R3</b> et
-      <b>R4</b> — deux résistances de <b>5,1 kΩ vers la masse</b>, posées à trois
-      millimètres de la prise. Ces deux résistances font trois choses à la fois : elles
-      annoncent « je suis un périphérique », elles indiquent à la source combien de
-      courant elle peut fournir, et elles révèlent quelle paire de données est active.
-      Sans elles, un chargeur USB-C moderne ne délivre <em>strictement rien</em> —
-      c'est la panne classique des premières cartes maison. Ensuite le <b>blindage</b> :
-      le corps métallique est ancré par des pattes traversantes, à la fois pour la tenue
-      mécanique — c'est le connecteur qu'on arrache — et pour écouler les décharges
-      électrostatiques vers la masse plutôt que vers le microcontrôleur.`,
-    tags:['E/S','FACE ARRIÈRE'],
-    labels:[['USB1','USB-C 16P'],['R3','CC · 5,1 kΩ']],
+    title:"Sixteen contacts and two resistors",
+    what:"The USB-C port",
+    html:`<b>USB1</b> is a <b>16-contact USB-C</b> receptacle soldered at the board edge —
+      the tallest part on the assembly at 3.9 mm. Two details are worth the detour.
+      First, <b>reversibility</b>: the connector is symmetric, so every function exists
+      twice and the board has to <em>work out which way round</em> the cable went in.
+      That is the job of the <b>CC1</b> and <b>CC2</b> pins, and of <b>R3</b> and
+      <b>R4</b> — two <b>5.1 kΩ resistors to ground</b>, placed three millimetres from
+      the receptacle. Those two resistors do three things at once: they announce "I am a
+      device", they tell the source how much current it may deliver, and they reveal
+      which data pair is live. Without them a modern USB-C charger supplies
+      <em>nothing at all</em> — the classic failure on a first home-made board. Second,
+      the <b>shield</b>: the metal body is anchored by through-hole legs, both for
+      mechanical strength — this is the connector that gets yanked — and to route
+      electrostatic discharge to ground instead of into the microcontroller.`,
+    tags:['I/O','BACK SIDE'],
+    labels:[['USB1','USB-C 16P'],['R3','CC · 5.1 kΩ']],
     refs:'USB1 · R3 R4 (CC1/CC2) · R36 R37 R38'
   },
   {
     group:'sd', icon:'▤',
-    title:"La boîte noire",
-    what:"Le lecteur microSD — l'enregistreur de vol",
-    html:`<b>Card1</b> est de très loin le plus gros composant de la carte :
-      <b>15 × 16 mm</b>, près d'un sixième de la surface totale. C'est un support
-      microSD <b>push-push</b> — on pousse pour insérer, on repousse pour éjecter ;
-      à l'intérieur, un ressort et une <em>came en cœur</em>, le même mécanisme que
-      dans un stylo rétractable. Sa fonction est l'équivalent, pour un drone, de la
-      boîte noire d'un avion : pendant le vol, le microcontrôleur y écrit des dizaines
-      de fois par seconde la consigne de chaque manche, les trois axes du gyroscope,
-      la sortie de chaque terme du PID et la commande envoyée à chaque moteur.
-      Après le vol, ces courbes se superposent — et c'est le seul moyen sérieux de
-      comprendre <b>pourquoi</b> un drone oscille, plutôt que de tourner les réglages
-      au hasard. La contrainte de montage est d'abord mécanique : le blindage doit
-      être brasé sur de larges plages de cuivre, parce que chaque insertion de carte
-      pousse sur le connecteur et travaille les soudures.`,
-    tags:['ENREGISTREMENT','FACE ARRIÈRE'],
-    labels:[['Card1','LECTEUR microSD']],
-    refs:'Card1 · TF-SMD push-push · 15,2 × 16,2 × 2,7 mm'
+    title:"The black box",
+    what:"The microSD socket — the flight recorder",
+    html:`<b>Card1</b> is by a wide margin the largest part on the board:
+      <b>15 × 16 mm</b>, close to a sixth of the total area. It is a <b>push-push</b>
+      microSD holder — push to insert, push again to eject; inside, a spring and a
+      <em>heart-shaped cam</em>, the same mechanism as a retractable pen. Its purpose is
+      the drone equivalent of an aircraft's black box: through the flight, the
+      microcontroller writes out every stick command, all three gyro axes, the output of
+      each PID term and the value sent to each motor, dozens of times a second.
+      Afterwards those traces overlay on one another — and that is the only serious way
+      to work out <b>why</b> a quad oscillates, rather than turning tuning knobs at
+      random. The mounting constraint is mechanical before it is electrical: the shield
+      has to be soldered to broad copper areas, because every card insertion pushes on
+      the connector and works the joints.`,
+    tags:['LOGGING','BACK SIDE'],
+    labels:[['Card1','microSD SOCKET']],
+    refs:'Card1 · TF-SMD push-push · 15.2 × 16.2 × 2.7 mm'
   },
   {
     group:'ports', icon:'⌸',
-    title:"Cinq peignes au pas d'un millimètre",
-    what:"La connectique et sa protection",
-    html:`Cinq connecteurs de la même famille — <b>pas de 1,00 mm</b>, contacts sur le
-      bord — mais de tailles différentes, et la taille trahit la fonction.
-      <b>P1</b>, <b>8 contacts</b> sur 10 mm, est le plus large : le format d'un
-      faisceau moteurs, quatre signaux plus la télémétrie, la masse et l'alimentation.
-      <b>U14</b> et <b>U8</b>, <b>6 contacts</b>, sont des ports mixtes liaison série
-      + alimentation. <b>CN1</b> (<b>4 contacts</b>) et <b>U13</b> (<b>3 contacts</b>)
-      sont les liaisons courtes : récepteur, vidéo, GPS.
-      Un point à comprendre avant de câbler : <em>il n'y a ni radio ni puce OSD sur
-      cette carte</em>. Le récepteur ExpressLRS et l'émetteur vidéo sont
-      <b>extérieurs</b> et se branchent ici. À côté, <b>U5</b>, <b>D2</b> et <b>D3</b>
-      protègent ces lignes : toute broche qui sort de la carte est une porte d'entrée
-      pour une décharge électrostatique, et ces diodes écoulent l'impulsion vers la
-      masse avant qu'elle n'atteigne le microcontrôleur.`,
-    tags:['E/S','FACE ARRIÈRE'],
+    title:"Five combs at one-millimetre pitch",
+    what:"The connectors and their protection",
+    html:`Five connectors from the same family — <b>1.00 mm pitch</b>, contacts on the
+      edge — but in different sizes, and the size gives away the function.
+      <b>P1</b>, <b>8 contacts</b> across 10 mm, is the widest: the shape of a motor
+      loom, four signals plus telemetry, ground and power. <b>U14</b> and <b>U8</b>,
+      <b>6 contacts</b>, are mixed serial-plus-power ports. <b>CN1</b>
+      (<b>4 contacts</b>) and <b>U13</b> (<b>3 contacts</b>) are the short links:
+      receiver, video, GPS. One thing to understand before wiring anything:
+      <em>there is no radio and no OSD chip on this board</em>. The ExpressLRS receiver
+      and the video transmitter are <b>external</b> and plug in here. Alongside,
+      <b>U5</b>, <b>D2</b> and <b>D3</b> guard those lines: any pin that leaves the board
+      is a way in for an electrostatic discharge, and these diodes shunt the pulse to
+      ground before it reaches the microcontroller.`,
+    tags:['I/O','BACK SIDE'],
     labels:[['P1','8 CONTACTS'],['U14','6 CONTACTS'],['U13','3 CONTACTS'],['CN1','4 CONTACTS']],
     refs:'P1 (8P) · U14 U8 (6P) · CN1 (4P) · U13 (3P) · U5 D2 D3'
   },
   {
     group:'*', icon:'✓',
-    title:"111 composants, deux faces",
-    what:"Assemblage terminé",
-    html:`La carte complète compte <b>111 composants placés</b> : un microcontrôleur,
-      une centrale inertielle, un quartz, dix circuits de service, trois bobines,
-      cinq LED, six connecteurs et quatre-vingt-quatre résistances et condensateurs —
-      <b>39 sur la face avant, 72 sur la face arrière</b>.
-      <br><br><b>Comment c'est vraiment fabriqué.</b> Ce guide avance une fonction à la
-      fois, parce que c'est comme ça qu'on comprend une carte. En production, l'ordre
-      est tout autre : <em>la face compte davantage que la fonction</em>. On imprime la
-      crème à braser au pochoir sur une face, une machine pose <b>tous</b> ses composants
-      en une passe à plus de dix par seconde, la carte traverse un four à refusion et
-      l'ensemble des soudures se fait <em>en une seule montée en température</em>.
-      Puis on retourne la carte et on recommence. Les 0201 mesurent 0,6 × 0,3 mm : rien
-      de tout cela ne se soude à la main.
-      <br><br><b>Ce qui n'est pas sur cette carte.</b> Pas de puce OSD dédiée, pas de
-      récepteur radio intégré, pas de baromètre, pas de capteur de courant. L'incrustation
-      vidéo se fait en logiciel dans le microcontrôleur ; la radio et la vidéo se
-      branchent sur les ports JST.`,
-    tags:['TERMINÉ','2 FACES'],
-    refs:'111 composants · 288 solides · 39 avant / 72 arrière'
+    title:"111 parts, two sides",
+    what:"Assembly complete",
+    html:`The finished board carries <b>111 placed components</b>: one microcontroller,
+      one inertial sensor, one crystal, ten service ICs, three inductors, five LEDs, six
+      connectors and eighty-four resistors and capacitors — <b>39 on the front side, 72
+      on the back</b>.
+      <br><br><b>How it is really built.</b> This guide advances one function at a time,
+      because that is how a board becomes understandable. In production the order is
+      quite different: <em>the side matters more than the function</em>. Solder paste is
+      printed through a stencil onto one face, a machine places <b>all</b> of that
+      face's parts in a single pass at better than ten a second, the board runs through
+      a reflow oven and every joint on it forms <em>in one temperature ramp</em>. Then it
+      is turned over and the whole thing happens again. The 0201s measure 0.6 × 0.3 mm:
+      none of this is hand-soldered.
+      <br><br><b>What is not on this board.</b> No dedicated OSD chip, no on-board radio
+      receiver, no barometer, no current sensor. The video overlay is generated in
+      software on the microcontroller; radio and video plug into the JST ports.`,
+    tags:['COMPLETE','BOTH SIDES'],
+    refs:'111 components · 288 solids · 39 front / 72 back'
   }
 ];
 
@@ -502,10 +493,9 @@ camera.add(rim);
 const pmrem = new THREE.PMREMGenerator(renderer);
 scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
 
-/* PIVOT tourne autour du centre géométrique de la carte ; MODEL porte le
-   recentrage et la mise à l'échelle. Séparer les deux est ce qui permet au
-   « Retourner » de faire tourner la carte sur elle-même au lieu de l'envoyer
-   hors du champ. */
+/* PIVOT turns about the board's geometric centre; MODEL carries the recentring
+   and the scale. Keeping them apart is what lets Flip spin the board on itself
+   instead of swinging it out of frame. */
 const PIVOT = new THREE.Group();
 const MODEL = new THREE.Group();
 PIVOT.add(MODEL);
@@ -516,57 +506,96 @@ OUTLINES.renderOrder = 999;
 PIVOT.add(OUTLINES);
 
 let partsMap = null;        // parts-map.json
-let byRef = new Map();      // refdes  -> composant
-let meshOf = new Map();     // nom glTF -> mesh
+let byRef = new Map();      // refdes    -> component
+let meshOf = new Map();     // glTF name -> mesh
 let boardMesh = null;
 let stepIndex = 0;
-let flipped = false;        // true = on regarde la face arrière
+let flipped = false;        // true = we are looking at the back side
 let xray = false;
 let boardMM = { centre:new THREE.Vector3(), size:new THREE.Vector3(), scale:1 };
 
 const ACCENT = new THREE.Color(0xff7a66);
 const GHOST  = new THREE.Color(0x5d7488);
+const MARK   = new THREE.Color(0x8a8a8a);
 
-/* La fiche occupe le bord gauche (ou le bas sur petit écran) : on décale la
-   projection pour que la carte reste centrée dans l'espace qui reste. */
+/* The card owns the left edge (the bottom on a narrow screen), so shift the
+   projection to keep the board centred in whatever space is left. */
 function applyViewOffset(){
   const w = innerWidth, h = innerHeight;
   const wide = w >= 900;
   camera.setViewOffset(w, h, wide ? -Math.min(215, (w-720)/2) : 0, wide ? 0 : 74, w, h);
 }
 
-/* ---------- matériaux : le GLB sort de KiCad en couleurs plates ---------- */
-function dressMaterial(mesh, isBoard){
+/* ---------- materials ----------------------------------------------------
+   KiCad exports everything as flat colour: metalness 0, roughness 1, and the
+   same grey for a ceramic capacitor, a steel shield and an epoxy package. The
+   footprint name says what the part actually is, and `role` (from
+   parts-map.json) says whether a given solid is the body, a lead, a shell or
+   moulded-in lettering -- enough to paint each one the way it looks in life.
+   -------------------------------------------------------------------------- */
+const SOLDER = 0xccd2d8;                 // tinned lead / termination
+const PALETTE = [
+  // MLCC: pale tan ceramic. Easily the biggest visual change -- 42 of them
+  [/^C_\d/,        { body:0xb99a72, rough:0.54, metal:0.04, lead:SOLDER }],
+  // thick-film chip resistor: dark top face over a white alumina substrate
+  [/^R_\d/,        { body:0x2b2b30, rough:0.48, metal:0.05, lead:SOLDER }],
+  // an unlit LED shows its phosphor, not the colour it emits
+  [/^LED_/,        { body:0xe6d6ab, rough:0.33, metal:0.0,  lead:SOLDER, glow:0x2b1e07 }],
+  // moulded power inductor: matte iron-powder composite
+  [/^IND-SMD/,     { body:0x3b3b41, rough:0.8,  metal:0.16, lead:SOLDER }],
+  // crystal: nickel-plated lid seam-welded to a ceramic base
+  [/^CRYSTAL/,     { body:0xd3d8de, rough:0.27, metal:0.9,  lead:SOLDER }],
+  // microSD: black plastic frame under a drawn stainless cage
+  [/^TF-SMD/,      { body:0x1d1d21, rough:0.55, metal:0.05, lead:SOLDER,
+                     shell:0xc9ced5, shellRough:0.25, shellMetal:0.93 }],
+  [/^USB-TYPE-C/,  { body:0xc9ced5, rough:0.26, metal:0.93, lead:SOLDER }],
+  // JST-SH shrouds are natural nylon; the contacts are gold-flashed
+  [/^CONN-SMD/,    { body:0xe4dfd2, rough:0.62, metal:0.03, lead:0xc8a24a }],
+  // tact switch: black moulding around a stainless dome
+  [/^SW-SMD/,      { body:0x1f1f22, rough:0.44, metal:0.05, lead:SOLDER }],
+  [/^SOD-|^X3-DFN/,{ body:0x232327, rough:0.4,  metal:0.08, lead:SOLDER }],
+];
+// QFN, LGA, SOT-23, SOT-583, WSON, X2SON, DFN: moulded black epoxy
+const EPOXY = { body:0x1c1c20, rough:0.43, metal:0.06, lead:SOLDER };
+
+const skinOf = fp => (PALETTE.find(([re]) => re.test(fp)) || [null, EPOXY])[1];
+
+function dressMaterial(mesh, comp, role){
   const m = mesh.material;
   m.side = THREE.FrontSide;
   m.envMapIntensity = 1.15;
 
-  if (isBoard){
-    // le stratifié est mat ; les normales lissées de KiCad font onduler une
-    // surface pourtant parfaitement plane, d'où le rendu à facettes
-    m.color.setHex(0x0f3b2b);
-    m.roughness = 0.62; m.metalness = 0.03;
+  if (!comp){                                    // the bare PCB
+    m.color.setHex(0x105c39);
+    m.roughness = 0.6; m.metalness = 0.04;
+    // KiCad's smoothed normals ripple across what is a dead-flat laminate
     m.flatShading = true;
   } else {
-    const c = m.color;
-    const grey = c.r > 0.5 && Math.abs(c.r-c.g) < 0.05 && Math.abs(c.g-c.b) < 0.05;
-    const dark = c.r + c.g + c.b < 0.35;
-    if (grey){
-      // boîtiers métalliques : blindages, cages, contacts, noyaux de bobine
-      m.color.setHex(0xcdd6dc); m.metalness = 0.88; m.roughness = 0.33;
-    } else if (dark){
-      // résine époxy des boîtiers : le noir pur lit comme un trou
-      m.color.setHex(0x23262b); m.metalness = 0.05; m.roughness = 0.52;
+    const skin = skinOf(comp.fp);
+    if (role === 'shell'){
+      m.color.setHex(skin.shell ?? skin.body);
+      m.roughness = skin.shellRough ?? skin.rough;
+      m.metalness = skin.shellMetal ?? skin.metal;
+    } else if (role === 'lead'){
+      m.color.setHex(skin.lead);
+      m.roughness = 0.34; m.metalness = 0.82;
+    } else if (role === 'mark'){
+      // moulded lettering: shift toward mid-grey so it reads on a body of
+      // any darkness, instead of picking one colour that vanishes on half
+      m.color.setHex(skin.body).lerp(MARK, 0.4);
+      m.roughness = Math.min(1, skin.rough + 0.15);
+      m.metalness = skin.metal;
     } else {
-      m.metalness = 0.08; m.roughness = 0.55;
-      m.color.multiplyScalar(1.35);
+      m.color.setHex(skin.body);
+      m.roughness = skin.rough; m.metalness = skin.metal;
+      if (skin.glow) m.emissive.setHex(skin.glow);
     }
   }
   mesh.userData.base = {
     color: m.color.clone(),
+    emissive: m.emissive.clone(),
     roughness: m.roughness,
-    metalness: m.metalness,
-    opacity: 1
+    metalness: m.metalness
   };
 }
 
@@ -579,6 +608,7 @@ function setState(mesh, state){
   m.depthWrite  = (state !== 'ghost');
   m.opacity     = (state === 'ghost') ? 0.26 : 1;
   m.color.copy(b.color);
+  m.emissive.copy(b.emissive);
   m.roughness = b.roughness;
   m.metalness = b.metalness;
 
@@ -587,13 +617,11 @@ function setState(mesh, state){
     m.emissive.setHex(0x7a2615);
     m.metalness = Math.min(b.metalness, 0.22);
     m.roughness = 0.38;
-  } else {
+  } else if (state === 'ghost'){
+    // a coloured ghost competes with the part being placed
+    m.color.lerp(GHOST, 0.7);
     m.emissive.setHex(0x000000);
-    if (state === 'ghost'){
-      // désaturer : un fantôme coloré se confond avec la pièce en cours
-      m.color.lerp(GHOST, 0.7);
-      m.metalness = 0.1; m.roughness = 0.7;
-    }
+    m.metalness = 0.1; m.roughness = 0.7;
   }
   m.needsUpdate = true;
 }
@@ -604,20 +632,20 @@ function setBoardState(ghost){
   m.transparent = ghost;
   m.depthWrite  = !ghost;
   m.opacity     = ghost ? 0.5 : 1;
-  // translucide et sombre sur fond sombre, le PCB disparaît : on l'éclaircit
-  // pour qu'il continue de situer les composants
-  m.color.setHex(ghost ? 0x2a7d5e : 0x0f3b2b);
+  // dark and translucent against a dark backdrop the PCB disappears, taking
+  // the components' frame of reference with it
+  m.color.setHex(ghost ? 0x2a7d5e : 0x105c39);
   m.needsUpdate = true;
 }
 
-/* ---------- chargement ---------- */
+/* ---------- loading ---------- */
 async function load(){
   const loader = new GLTFLoader().setMeshoptDecoder(MeshoptDecoder);
   const [board, parts, map] = await Promise.all([
     loader.loadAsync(`${ASSETS}/fc-board.glb`),
     loader.loadAsync(`${ASSETS}/fc-parts.glb`),
     fetch(`${ASSETS}/parts-map.json`).then(r => {
-      if (!r.ok) throw new Error(`parts-map.json : ${r.status}`);
+      if (!r.ok) throw new Error(`parts-map.json: ${r.status}`);
       return r.json();
     })
   ]);
@@ -625,12 +653,23 @@ async function load(){
   partsMap = map;
   for (const c of map.components) byRef.set(c.ref, c);
 
-  MODEL.add(board.scene, parts.scene);
-  board.scene.traverse(o => { if (o.isMesh){ boardMesh = o; dressMaterial(o, true); } });
-  parts.scene.traverse(o => { if (o.isMesh){ meshOf.set(o.name, o); dressMaterial(o, false); } });
+  // every solid needs to know which component it belongs to before it can be
+  // painted: the footprint decides the material, the role decides the part of it
+  const owner = new Map();
+  for (const c of map.components)
+    for (const [name, role] of Object.entries(c.meshes)) owner.set(name, [c, role]);
 
-  // recentrer sur la carte nue, pas sur l'encombrement des connecteurs :
-  // le centre du PCB est le point autour duquel il est naturel de la retourner
+  MODEL.add(board.scene, parts.scene);
+  board.scene.traverse(o => { if (o.isMesh){ boardMesh = o; dressMaterial(o, null, 'board'); } });
+  parts.scene.traverse(o => {
+    if (!o.isMesh) return;
+    meshOf.set(o.name, o);
+    const [comp, role] = owner.get(o.name) || [null, 'body'];
+    dressMaterial(o, comp, role);
+  });
+
+  // centre on the bare PCB rather than the connector envelope: the board's own
+  // centre is the natural point to turn it about
   const box = new THREE.Box3().setFromObject(board.scene);
   const centre = box.getCenter(new THREE.Vector3());
   const size = box.getSize(new THREE.Vector3());
@@ -639,20 +678,20 @@ async function load(){
   MODEL.position.copy(centre).multiplyScalar(-S);
   boardMM = { centre, size, scale:S };
 
-  const missing = map.components.filter(c => c.meshes.some(n => !meshOf.has(n)));
-  if (missing.length) console.warn('maillages absents du GLB :', missing.map(c => c.ref));
+  const missing = map.components.filter(c => Object.keys(c.meshes).some(n => !meshOf.has(n)));
+  if (missing.length) console.warn('meshes missing from the GLB:', missing.map(c => c.ref));
 
   $('load').style.opacity = 0;
   setTimeout(() => $('load').remove(), 500);
   showStep(0, true);
 }
 
-/* ---------- passage d'un point du modèle (mm) au monde ---------- */
+/* ---------- model space (mm) to world ---------- */
 const _v = new THREE.Vector3();
 function toWorld(xmm, ymm, zmm, flipY){
   _v.set(xmm/1000, ymm/1000, zmm/1000)
     .sub(boardMM.centre).multiplyScalar(boardMM.scale);
-  if (flipY) _v.set(-_v.x, _v.y, -_v.z);   // rotation de π autour de Y
+  if (flipY) _v.set(-_v.x, _v.y, -_v.z);   // a π rotation about Y
   return _v.clone();
 }
 function centreOf(c, flipY){
@@ -660,7 +699,7 @@ function centreOf(c, flipY){
                  (c.bb[0][2]+c.bb[1][2])/2, flipY);
 }
 
-/* ---------- contours du composant en cours ---------- */
+/* ---------- outline around the part being placed ---------- */
 const outlineMat = new THREE.LineBasicMaterial({ color:0xff7a66, transparent:true, opacity:0.9, depthTest:false });
 function drawOutlines(comps){
   OUTLINES.clear();
@@ -678,7 +717,7 @@ function drawOutlines(comps){
   }
 }
 
-/* ---------- étiquettes ---------- */
+/* ---------- labels ---------- */
 const labelEls = [];
 function buildLabels(step){
   const host = $('labels'), svg = $('leaders');
@@ -711,19 +750,19 @@ const _p = new THREE.Vector3();
 function positionLabels(){
   if (!labelEls.length) return;
   const w = innerWidth, h = innerHeight;
-  const top = 146, bottom = h - 118;     // sous le bandeau, au-dessus des boutons
+  const top = 146, bottom = h - 118;     // below the header, above the buttons
   const hubX = w/2 + (w >= 900 ? 215 : 0);
   const hubY = h/2 - (w >= 900 ? 0 : 74);
 
-  // projeter d'abord toutes les pièces…
+  // project every part first…
   const shots = labelEls.map(l => {
     const [lo, hi] = l.comp.bb;
     _p.set((lo[0]+hi[0])/2/1000, (lo[1]+hi[1])/2/1000, (lo[2]+hi[2])/2/1000);
     MODEL.localToWorld(_p).project(camera);
     return { l, sx:(_p.x*0.5+0.5)*w, sy:(-_p.y*0.5+0.5)*h, behind:_p.z > 1 };
   });
-  // …puis les poser de haut en bas : l'ordre vertical des étiquettes suit celui
-  // des pièces, ce qui empêche les lignes de repère de se croiser
+  // …then lay them out top to bottom, so label order follows part order and
+  // the leader lines cannot cross
   shots.sort((a, b) => a.sy - b.sy);
 
   const placed = [];
@@ -734,15 +773,15 @@ function positionLabels(){
     let ly = s.sy + dy/len * 108;
     lx = Math.max(w >= 900 ? 470 : 80, Math.min(w-100, lx));
     ly = Math.max(top, ly);
-    // posées de haut en bas, il suffit de repousser vers le bas
+    // placed in order, so pushing down is enough
     for (const q of placed){
       if (Math.abs(lx-q.x) < 168 && ly < q.y + 44) ly = q.y + 44;
     }
     placed.push({ x:lx, y:ly });
   }
-  // si la pile déborde, on remonte la colonne entière — mais jamais plus que la
-  // marge disponible en haut, sinon le décalage rabat les étiquettes l'une sur
-  // l'autre au lieu de les espacer
+  // if the stack overflows, lift the whole column — but never by more than the
+  // headroom above it, or the shift folds labels back onto each other instead
+  // of spacing them out
   const overflow = Math.max(...placed.map(q => q.y)) - bottom;
   const headroom = Math.min(...placed.map(q => q.y)) - top;
   const shift = Math.min(Math.max(overflow, 0), Math.max(headroom, 0));
@@ -758,7 +797,7 @@ function positionLabels(){
     s.l.dot.setAttribute('opacity', shown);
     s.l.dot.setAttribute('cx', s.sx);
     s.l.dot.setAttribute('cy', s.sy);
-    // coude horizontal puis segment vers la pièce : plus lisible qu'une droite
+    // a horizontal elbow then a run to the part reads better than one diagonal
     const elbow = lx + (s.sx > lx ? 34 : -34);
     s.l.line.setAttribute('d', `M ${lx} ${ly} L ${elbow} ${ly} L ${s.sx} ${s.sy}`);
   });
@@ -785,8 +824,8 @@ function installedBefore(idx){
 function showStep(idx, instant){
   stepIndex = idx;
   const s = STEPS[idx];
-  // l'étape finale n'installe rien : elle montre la carte telle qu'elle sort
-  // du four, en matériaux normaux — tout surligner n'apprendrait rien
+  // the last step installs nothing: it shows the board as it leaves the oven, in
+  // normal materials — highlighting all of it would teach nothing
   const finale = s.group === '*';
   const active = finale ? [] : componentsFor(s);
   const done = finale ? new Set(partsMap.components.map(c => c.ref)) : installedBefore(idx);
@@ -800,26 +839,26 @@ function showStep(idx, instant){
   $('cWhat').textContent = s.what;
   $('cBlurb').innerHTML = s.html;
   $('cTags').innerHTML = (s.tags||[])
-    .map(t => `<span class="tag${/FACE/.test(t) ? ' face' : ''}">${t}</span>`).join('');
-  $('cRefs').innerHTML = s.refs ? `<i>sur la carte :</i> ${s.refs}` : '';
+    .map(t => `<span class="tag${/SIDE/.test(t) ? ' face' : ''}">${t}</span>`).join('');
+  $('cRefs').innerHTML = s.refs ? `<i>on the board:</i> ${s.refs}` : '';
   $('card').scrollTop = 0;
 
-  // état de chaque maillage
+  // per-mesh state
   for (const c of partsMap.components){
     const state = activeRefs.has(c.ref) ? 'active'
                 : done.has(c.ref)       ? 'installed'
                 : 'hidden';
-    for (const name of c.meshes){
+    for (const name of Object.keys(c.meshes)){
       const mesh = meshOf.get(name);
       if (mesh) setState(mesh, state);
     }
   }
 
-  // quelle face regarder ?
+  // which side are we meant to be looking at?
   const back = active.filter(c => c.back).length;
   const front = active.length - back;
-  // « deux faces » seulement si la répartition est réelle : deux LED témoins en
-  // face d'un étage de puissance ne justifient pas de rendre le PCB translucide
+  // "both sides" only when the split is real: two indicator LEDs opposite a
+  // power stage are no reason to make the whole PCB translucent
   const bothFaces = !finale && active.length > 0 &&
                     Math.min(front, back) / active.length >= 0.25;
   const wantFlip = active.length ? (back > front) : flipped;
@@ -828,7 +867,7 @@ function showStep(idx, instant){
     setBoardState(true);
     for (const c of partsMap.components){
       if (activeRefs.has(c.ref) || !done.has(c.ref)) continue;
-      for (const name of c.meshes){
+      for (const name of Object.keys(c.meshes)){
         const mesh = meshOf.get(name);
         if (mesh) setState(mesh, 'ghost');
       }
@@ -837,23 +876,23 @@ function showStep(idx, instant){
     setBoardState(false);
   }
 
-  $('face').textContent = finale ? 'CARTE TERMINÉE — 111 COMPOSANTS'
-    : !s.group ? 'CARTE NUE — AVANT ASSEMBLAGE'
-    : bothFaces ? 'LES DEUX FACES — utilisez « Retourner »'
-    : wantFlip ? 'FACE ARRIÈRE — connectique' : 'FACE AVANT — calcul';
+  $('face').textContent = finale ? 'BOARD COMPLETE — 111 PARTS'
+    : !s.group ? 'BARE BOARD — BEFORE ASSEMBLY'
+    : bothFaces ? 'BOTH SIDES — use Flip'
+    : wantFlip ? 'BACK SIDE — connectivity' : 'FRONT SIDE — compute';
 
-  drawOutlines(active.filter(c => c.meshes.length && (c.bb[1][0]-c.bb[0][0]) > 0));
+  drawOutlines(active.filter(c => Object.keys(c.meshes).length && (c.bb[1][0]-c.bb[0][0]) > 0));
   buildLabels(s);
 
   if (wantFlip !== flipped) setFlip(wantFlip, instant);
   frameOn(active, wantFlip, instant);
 
   $('btnBack').disabled = (idx === 0);
-  $('btnNext').textContent = (idx === STEPS.length-1) ? '↺ Recommencer' : 'Suivant →';
+  $('btnNext').textContent = (idx === STEPS.length-1) ? '↺ Start over' : 'Next →';
 }
 
-/* Retourner la carte sur elle-même : rotation de π autour de l'axe vertical
-   du PIVOT, qui est déjà au centre géométrique du PCB. */
+/* Flip the board on itself: a π rotation about PIVOT's vertical axis, which
+   already sits at the geometric centre of the PCB. */
 function setFlip(next, instant){
   flipped = next;
   const to = flipped ? Math.PI : 0;
@@ -861,10 +900,10 @@ function setFlip(next, instant){
   else gsap.to(PIVOT.rotation, { y:to, duration:0.95, ease:'power3.inOut' });
 }
 
-/* On ne resserre jamais au point de perdre la carte : savoir *où* se trouve
-   un composant compte autant que le voir. Le cadrage garde donc toujours la
-   quasi-totalité du PCB dans le champ et se contente de glisser vers la zone
-   active — c'est le surlignage et l'étiquette qui désignent la pièce. */
+/* Never tighten in far enough to lose the board: knowing *where* a component
+   sits matters as much as seeing it. Framing keeps nearly the whole PCB in
+   view and only drifts toward the active area — the highlight and the label
+   are what single the part out. */
 function frameOn(comps, willFlip, instant){
   const centre = new THREE.Vector3();
   let spread = 1;
@@ -874,11 +913,11 @@ function frameOn(comps, willFlip, instant){
       lo[a] = Math.min(lo[a], c.bb[0][a]); hi[a] = Math.max(hi[a], c.bb[1][a]);
     }
     centre.copy(toWorld((lo[0]+hi[0])/2, (lo[1]+hi[1])/2, (lo[2]+hi[2])/2, willFlip));
-    centre.multiplyScalar(0.30);           // glisser vers la zone, pas dessus
+    centre.multiplyScalar(0.30);           // drift toward the area, not onto it
     spread = Math.max(hi[0]-lo[0], hi[1]-lo[1]) / 1000 * boardMM.scale;
   }
-  // le bandeau et les boutons mangent ~20 % de la hauteur : la carte doit tenir
-  // dans ce qui reste, sinon elle sort du cadre en haut et à droite
+  // header and buttons eat ~20 % of the height, so the board has to fit in what
+  // is left or it runs off the top and right edges
   const fit = THREE.MathUtils.lerp(1.80, 2.06, THREE.MathUtils.clamp(spread, 0, 1));
   const dist = THREE.MathUtils.clamp(fit, 1.80, 2.06);
   const dir = new THREE.Vector3(0.26, 0.46, 1).normalize();
@@ -937,10 +976,10 @@ animate();
 load().catch(err => {
   console.error(err);
   $('load').innerHTML = `<div style="text-align:center">
-    <b style="color:#ff7a66">Chargement impossible</b><br><br>
+    <b style="color:#ff7a66">Could not load</b><br><br>
     ${err.message}<br><br>
-    <span style="color:#6f96b1">Servez le dossier via HTTP (les fichiers GLB et JSON<br>
-    ne se chargent pas depuis file://).</span></div>`;
+    <span style="color:#6f96b1">Serve this folder over HTTP — GLB and JSON files<br>
+    will not load from a file:// URL.</span></div>`;
 });
 </script>
 </body>
