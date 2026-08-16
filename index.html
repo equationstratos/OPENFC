@@ -3,236 +3,945 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <title>OpenFC — Flight Controller Visualizer</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+  <title>OpenFC — Guide d'assemblage</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%230f3b2b'/%3E%3Crect x='9' y='9' width='14' height='14' rx='2' fill='%23cdd6dc'/%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
   <style>
-    :root{ --cyan:#00A7E1; --ok:#37e0a0; --ink:#eaf4fb; --dim:#9fc0d6; }
+    :root{
+      --cyan:#00A7E1; --cyan-dim:#0a6d99;
+      --accent:#ff7a66;            /* la couleur du composant en cours de pose */
+      --accent-soft:#ffb3a5;
+      --ok:#37e0a0;
+      --ink:#eaf4fb; --dim:#9fc0d6; --faint:#6f96b1;
+      --bg:#0b1622; --panel:#0e2236; --line:#1d3d59;
+    }
     *{box-sizing:border-box}
-    html,body{margin:0;height:100%;overflow:hidden;background:#0b1622;font-family:Inter,system-ui,sans-serif;color:var(--ink);-webkit-user-select:none;user-select:none;}
-    #viewport{width:100%;height:100%;position:relative}
+    html,body{margin:0;height:100%;overflow:hidden;background:var(--bg);
+      font-family:Inter,system-ui,sans-serif;color:var(--ink);
+      -webkit-user-select:none;user-select:none;-webkit-font-smoothing:antialiased}
     canvas{display:block;touch-action:none}
-    #top{position:fixed;top:0;left:0;right:0;z-index:5;padding:14px 18px;background:linear-gradient(180deg,#0b1622f2,#0b162200);pointer-events:none}
-    #topInner{display:flex;align-items:center;gap:14px;max-width:1180px;margin:0 auto}
-    #logo{flex:none;width:44px;height:44px;border-radius:12px;background:var(--cyan);color:#04222f;display:grid;place-items:center;font-size:22px;box-shadow:0 6px 18px #00a7e155}
+    #viewport{position:fixed;inset:0}
+
+    /* ---------- bandeau ---------- */
+    #top{position:fixed;top:0;left:0;right:0;z-index:5;padding:14px 18px 0;
+      background:linear-gradient(180deg,#0b1622f2 55%,#0b162200);pointer-events:none}
+    #topInner{display:flex;align-items:center;gap:14px;max-width:1240px;margin:0 auto}
+    #logo{flex:none;width:44px;height:44px;border-radius:12px;
+      background:linear-gradient(160deg,#22c5ff,#0a6d99);color:#04222f;
+      display:grid;place-items:center;font-size:21px;box-shadow:0 6px 18px #00a7e155}
     #ttl{flex:1;min-width:0}
-    #prog{flex:none;text-align:right;font-size:12px;color:var(--dim)}
-    #bar{max-width:1180px;margin:11px auto 0;height:6px;border-radius:4px;background:#16304a;overflow:hidden}
-    #barFill{height:100%;width:0;border-radius:4px;background:linear-gradient(90deg,var(--cyan),var(--ok));transition:width .5s}
-    #card{position:fixed;left:18px;bottom:18px;z-index:6;width:400px;background:#0e2236f6;border-left:4px solid var(--cyan);padding:20px;border-radius:18px;box-shadow:0 10px 30px #000;max-height:80vh;overflow-y:auto}
-    #card h3{margin:0;font-size:1.2rem}
-    #card p{font-size:0.9rem;color:var(--dim);line-height:1.5}
-    #ctl{position:fixed;right:18px;bottom:18px;z-index:6;display:flex;gap:9px;align-items:center}
-    .btn{border:1px solid #244863;background:#102a40e6;color:var(--ink);border-radius:11px;padding:12px 16px;font:800 13.5px Inter;cursor:pointer}
-    .btn.pri{background:linear-gradient(180deg,#0d84b8,#0a6d99);color:#fff}
-    .sm{padding:10px 12px;font-size:13px}
+    #ttl b{display:block;font-size:15px;letter-spacing:.2px}
+    #ttl span{display:block;font-size:12.5px;color:var(--dim);margin-top:1px}
+    #prog{flex:none;text-align:right}
+    #prog b{font-size:19px;font-weight:800}
+    #prog span{display:block;font-size:11px;color:var(--dim);letter-spacing:.4px}
+    #bar{max-width:1240px;margin:11px auto 0;height:5px;border-radius:4px;background:#16304a;overflow:hidden}
+    #barFill{height:100%;width:0;border-radius:4px;
+      background:linear-gradient(90deg,var(--cyan),var(--ok));transition:width .45s cubic-bezier(.4,0,.2,1)}
+
+    /* ---------- fiche ---------- */
+    #card{position:fixed;left:18px;bottom:18px;z-index:6;width:420px;max-width:calc(100vw - 36px);
+      background:#0e2236f2;backdrop-filter:blur(14px);
+      border:1px solid var(--line);border-left:4px solid var(--accent);
+      padding:19px 20px 17px;border-radius:16px;box-shadow:0 18px 44px #0009;
+      max-height:calc(100vh - 190px);overflow-y:auto;overscroll-behavior:contain;
+      /* estompe la dernière ligne : indique que la fiche continue plus bas */
+      mask-image:linear-gradient(180deg,#000 calc(100% - 26px),transparent);
+      -webkit-mask-image:linear-gradient(180deg,#000 calc(100% - 26px),transparent)}
+    #card::-webkit-scrollbar{width:6px}
+    #card::-webkit-scrollbar-thumb{background:#24506f;border-radius:3px}
+    #cHead{display:flex;gap:12px;align-items:flex-start;margin-bottom:11px}
+    #cIcon{flex:none;width:34px;height:34px;border-radius:10px;background:#12395a;
+      display:grid;place-items:center;font-size:17px;border:1px solid #23557d}
+    #cTitle{margin:0;font-size:1.18rem;font-weight:800;line-height:1.25;letter-spacing:-.2px}
+    #cWhat{color:var(--cyan);font-weight:700;font-size:.79rem;margin-top:3px;letter-spacing:.1px}
+    #cBlurb{font-size:.875rem;color:#c3d9e8;line-height:1.62;margin:0}
+    #cBlurb b{color:#fff;font-weight:700}
+    #cBlurb em{color:var(--accent-soft);font-style:normal;font-weight:600}
+    #cTags{display:flex;flex-wrap:wrap;gap:6px;margin-top:14px}
+    .tag{font-size:10px;font-weight:800;letter-spacing:.7px;padding:4px 9px;border-radius:6px;
+      background:#12395a;color:#8fd0f2;border:1px solid #1e4d73}
+    .tag.face{background:#3a2318;color:#ffb99f;border-color:#5c3626}
+    #cRefs{font-family:'JetBrains Mono',ui-monospace,monospace;font-size:.665rem;color:var(--faint);
+      margin-top:11px;line-height:1.65;word-break:break-word;border-top:1px solid #17334c;padding-top:9px}
+    #cRefs i{color:#547d99;font-style:normal}
+
+    /* ---------- commandes ---------- */
+    #ctl{position:fixed;right:18px;bottom:18px;z-index:6;display:flex;gap:8px;align-items:center}
+    #tools{position:fixed;right:18px;top:84px;z-index:6;display:flex;flex-direction:column;gap:7px;align-items:flex-end}
+    .btn{border:1px solid #244863;background:#102a40e0;backdrop-filter:blur(8px);color:var(--ink);
+      border-radius:10px;padding:11px 15px;font:800 13px Inter,sans-serif;cursor:pointer;
+      display:inline-flex;align-items:center;gap:7px;transition:.16s}
+    .btn:hover:not(:disabled){background:#1a3d5ae0;border-color:#3570a0}
+    .btn:disabled{opacity:.35;cursor:default}
+    .btn.pri{background:linear-gradient(180deg,#0d8cc4,#0a6d99);border-color:#12a0dd;color:#fff}
+    .btn.pri:hover{background:linear-gradient(180deg,#14a0dd,#0c7cae)}
+    .btn.on{background:#0d5f7ee0;border-color:var(--cyan);color:#9de4ff}
+    .sm{padding:9px 12px;font-size:12px}
+    #face{position:fixed;left:50%;top:88px;transform:translateX(-50%);z-index:6;
+      font:800 11px Inter,sans-serif;letter-spacing:1.1px;padding:6px 14px;border-radius:20px;
+      background:#102a40cc;border:1px solid #2a5b82;color:#8fd0f2;backdrop-filter:blur(8px);
+      pointer-events:none;transition:.25s}
+
+    /* ---------- étiquettes 3D ---------- */
+    #labels{position:fixed;inset:0;z-index:4;pointer-events:none;overflow:hidden}
+    #leaders{position:absolute;inset:0;width:100%;height:100%}
+    .lbl{position:absolute;transform:translate(-50%,-50%);white-space:nowrap;
+      font:800 14px Inter,sans-serif;letter-spacing:-.1px;padding:5px 12px;border-radius:9px;
+      background:#0b1622ee;border:2px solid var(--accent);color:#fff;
+      box-shadow:0 4px 16px #0008;opacity:0;transition:opacity .3s}
+    .lbl small{display:block;font-size:9.5px;font-weight:700;letter-spacing:.6px;
+      color:var(--accent-soft);margin-top:1px}
+
+    #hint{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);z-index:5;
+      font-size:11.5px;color:var(--faint);pointer-events:none;transition:opacity .5s}
+    #load{position:fixed;inset:0;z-index:20;display:grid;place-items:center;background:var(--bg);
+      font-size:13px;color:var(--dim);transition:opacity .5s}
+
+    @media (max-width:900px){
+      #card{width:auto;right:18px;max-height:44vh;font-size:13px}
+      #tools{top:76px}
+      #ctl{left:18px;justify-content:flex-end}
+      .lbl{font-size:12px;padding:4px 9px}
+    }
   </style>
-  <!-- Importmap pour Three.js -->
+
   <script type="importmap">
-    {
-      "imports": {
+    { "imports": {
         "three": "https://unpkg.com/three@0.163.0/build/three.module.js",
         "three/addons/": "https://unpkg.com/three@0.163.0/examples/jsm/"
-      }
-    }
+    } }
   </script>
-  <!-- GSAP pour les animations -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
 </head>
 <body>
+  <div id="viewport"></div>
+
+  <div id="labels"><svg id="leaders"></svg></div>
+
   <div id="top">
     <div id="topInner">
-      <div id="logo">🚀</div>
-      <div id="ttl"><b>OpenFC Build</b><span>Contrôleur de vol Open-Source</span></div>
-      <div id="prog"><b id="pCount">1/8</b><br><span>étapes</span></div>
+      <div id="logo">⬡</div>
+      <div id="ttl">
+        <b>OpenFC — Guide d'assemblage</b>
+        <span>Contrôleur de vol open source · un sous-ensemble à la fois</span>
+      </div>
+      <div id="prog"><b id="pCount">1/14</b><span>ÉTAPES</span></div>
     </div>
     <div id="bar"><div id="barFill"></div></div>
   </div>
-  <div id="viewBtns" style="position:fixed;top:80px;right:18px;z-index:6;display:flex;gap:6px">
-    <label class="btn sm"><input type="checkbox" id="chkSpin"> Auto-spin</label>
-    <button class="btn sm" id="btnFlip">🔄 Flip</button>
+
+  <div id="face">FACE AVANT</div>
+
+  <div id="tools">
+    <button class="btn sm" id="btnXray" title="Rendre le PCB translucide">◍ Rayons X</button>
+    <button class="btn sm" id="btnSpin" title="Rotation automatique">↻ Rotation</button>
   </div>
+
   <div id="card">
-    <h3 id="cTitle">Chargement...</h3>
-    <div id="cWhat" style="color:var(--cyan); font-weight:bold; margin-bottom:5px"></div>
-    <p id="cBlurb"></p>
-    <div id="cRefs" style="font-family:monospace; font-size:0.7rem; color:#6f96b1; margin-top:10px"></div>
+    <div id="cHead">
+      <div id="cIcon">⬡</div>
+      <div>
+        <h3 id="cTitle">Chargement…</h3>
+        <div id="cWhat"></div>
+      </div>
+    </div>
+    <p id="cBlurb">Lecture du modèle 3D et de la nomenclature.</p>
+    <div id="cTags"></div>
+    <div id="cRefs"></div>
   </div>
-  <div id="viewport"></div>
+
   <div id="ctl">
-    <button class="btn sm" id="btnReframe">🎯 Reset</button>
-    <button class="btn" id="btnBack" disabled>← Back</button>
-    <button class="btn pri" id="btnNext">Next →</button>
+    <button class="btn sm" id="btnFlip">⟲ Retourner</button>
+    <button class="btn sm" id="btnReframe">⊙ Recadrer</button>
+    <button class="btn" id="btnBack" disabled>← Précédent</button>
+    <button class="btn pri" id="btnNext">Suivant →</button>
   </div>
 
-  <script type="module">
-    import * as THREE from 'three';
-    import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
-    import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
-    import { MeshoptDecoder } from 'three/addons/libs/meshopt_decoder.module.js';
-    import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
+  <div id="hint">Glisser pour orbiter · molette pour zoomer · ← → pour naviguer</div>
+  <div id="load">Chargement du modèle…</div>
 
-    const ASSETS = './assets/openfc-visualizer'; 
-    const STEPS = [
-        {title:'The Heart', what:'MCU (RP2354B)', blurb:'Installation du microcontrôleur principal.'},
-        {title:'The Gyro', what:'IMU (BMI270)', blurb:'Installation de l\'unité de mesure inertielle.'},
-        {title:'Video/OSD', what:'OSD Chip', blurb:'Circuit d\'incrustation vidéo.'},
-        {title:'Blackbox', what:'MicroSD Slot', blurb:'Port carte SD pour les logs.'},
-        {title:'Power', what:'Buck & LDO', blurb:'Gestion de l\'alimentation 5V/3.3V.'},
-        {title:'Radio', what:'ExpressLRS', blurb:'Module radio intégré.'},
-        {title:'Input/Output', what:'USB-C & Pads', blurb:'Connectique et alimentation.'},
-        {title:'Final Assembly', what:'Ready to fly', blurb:'Assemblage terminé.'}
-    ];
+<script type="module">
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+import { MeshoptDecoder } from 'three/addons/libs/meshopt_decoder.module.js';
+import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 
-    const renderer = new THREE.WebGLRenderer({ antialias: true });
-    renderer.setPixelRatio(Math.min(2, devicePixelRatio));
-    renderer.setSize(innerWidth, innerHeight);
-    renderer.shadowMap.enabled = true;
-    renderer.toneMapping = THREE.ACESFilmicToneMapping; 
-    renderer.toneMappingExposure = 1.05;
-    document.getElementById('viewport').appendChild(renderer.domElement);
+const ASSETS = './assets/openfc-visualizer';
 
-    const scene = new THREE.Scene(); 
-    scene.background = new THREE.Color(0x0b1622);    
+/* ==========================================================================
+   Le contenu du guide.
 
-    const camera = new THREE.PerspectiveCamera(40, innerWidth/innerHeight, 0.001, 50);
-    const controls = new OrbitControls(camera, renderer.domElement);
-    controls.enableDamping = true;
-    controls.dampingFactor = 0.08;
+   `group` renvoie au champ `step` de parts-map.json : c'est lui qui décide
+   quels composants s'allument à cette étape. `labels` sont les repères posés
+   dans la vue 3D — volontairement peu nombreux, pour rester lisibles.
+   ========================================================================== */
+const STEPS = [
+  {
+    group:null, icon:'▢',
+    title:"Quatre trous et beaucoup de cuivre",
+    what:"Le circuit imprimé — le squelette",
+    html:`Tout commence par un carré de fibre de verre de <b>37,9 mm de côté</b>, épais
+      de <b>0,94 mm</b>. Les quatre trous de <b>Ø4 mm</b> ne sont pas placés au hasard :
+      leurs centres forment un carré de <b>30,5 × 30,5 mm</b>, le standard de fixation
+      qu'utilisent la quasi-totalité des drones de 5 pouces et plus. Ils reçoivent des
+      <b>silentblocs</b> en caoutchouc, et ce détail est électronique autant que mécanique :
+      ils filtrent les vibrations du châssis avant qu'elles n'atteignent le gyroscope.
+      À l'intérieur du stratifié, le cuivre est empilé en couches — les faces externes
+      portent les pistes, les couches internes sont des <b>plans pleins</b>. Ce plan de
+      masse est la pièce la plus importante de la carte alors qu'il n'apparaît sur aucune
+      nomenclature : il sert de <em>chemin de retour</em> à tous les courants, et de
+      <em>blindage</em> entre les commutations de l'alimentation et le capteur.
+      Les composants se répartissent sur les <b>deux faces</b> : 39 devant, 72 derrière.`,
+    tags:['PCB','2 FACES'],
+    refs:'30,5 × 30,5 mm · Ø4,0 mm · ép. 0,94 mm · 37,9 × 37,9 mm'
+  },
+  {
+    group:'rails', icon:'⚡',
+    title:"Deux hacheurs, deux rails",
+    what:"Les convertisseurs à découpage — l'alimentation",
+    html:`La batterie d'un drone n'est pas une source propre : sur une 4S elle tombe de
+      <b>16,8 V à 13 V</b> dès que vous mettez les gaz, avec des pics à chaque commutation
+      des moteurs. Rien de numérique ne supporte ça. Deux <b>convertisseurs abaisseurs</b>
+      s'en chargent — <b>U6</b> et <b>U16</b>, deux boîtiers SOT-23-6 de 2,9 × 1,6 mm.
+      Le principe : un transistor interne <em>hache</em> la tension d'entrée à quelques
+      centaines de kilohertz. Chaque impulsion pousse du courant dans une <b>bobine</b> —
+      <b>L2</b> et <b>L3</b>, deux cubes blindés de 3 × 3 mm — qui <em>stocke l'énergie
+      dans un champ magnétique</em> puis la restitue pendant que le transistor est bloqué.
+      Comme on transfère l'énergie au lieu d'en brûler, le rendement dépasse <b>90 %</b>.
+      Les condensateurs 0805 et 0603 (C22/C23, C26/C27) encadrent chaque bobine : ils
+      fournissent les pics de courant que la piste d'entrée, avec son inductance parasite,
+      ne peut pas délivrer assez vite. Chaque étage a son témoin — <b>D4</b> et <b>D5</b>,
+      posées juste en face sur l'autre face de la carte.`,
+    tags:['PUISSANCE','FACE ARRIÈRE'],
+    labels:[['L2','ÉTAGE 1 · bobine + U6'],['L3','ÉTAGE 2 · bobine + U16']],
+    refs:'U6 U16 · L2 L3 · C22 C23 C26 C27 · D4 D5'
+  },
+  {
+    group:'ldo', icon:'⛉',
+    title:"Quand on préfère perdre de l'énergie",
+    what:"Les régulateurs linéaires — la propreté",
+    html:`Un hacheur est efficace, mais <b>bruyant</b> : à chaque commutation il injecte
+      des parasites sur son rail. Pour un gyroscope MEMS, qui mesure des variations de
+      capacité de l'ordre du <b>femtofarad</b>, ce bruit se retrouve directement dans la
+      mesure. D'où <b>U15</b>, un WSON-6 de 2 × 2 mm posé littéralement contre la centrale
+      inertielle. Un <b>LDO</b> ne découpe rien : c'est un transistor maintenu en zone
+      linéaire par une boucle de contre-réaction, une <em>résistance variable</em> ajustée
+      en permanence pour tenir la sortie à la bonne valeur. Aucun bruit de commutation —
+      mais tout ce qu'il ne laisse pas passer part <em>en chaleur</em>. C'est le compromis
+      assumé : on gaspille quelques dizaines de milliwatts pour gagner un rail propre.
+      <b>U7</b>, boîtier identique sur l'autre face, alimente une autre section. Règle de
+      montage : le condensateur de sortie doit toucher la broche — ici C31 et C42 sont à
+      moins d'un millimètre.`,
+    tags:['PUISSANCE','2 FACES'],
+    labels:[['U15','LDO GYRO'],['U7','LDO']],
+    refs:'U7 U15 · C30 C31 C32 C42'
+  },
+  {
+    group:'mcu', icon:'▦',
+    title:"Quatre-vingts pattes sous dix millimètres",
+    what:"Le microcontrôleur RP2354B",
+    html:`Le composant central, <b>U2</b>, est un <b>QFN-80</b> de 10 × 10 mm au
+      <b>pas de 0,40 mm</b> : quatre-vingts contacts sur le pourtour, plus un
+      <b>pavé thermique de 3,4 mm</b> au centre qui évacue la chaleur vers le plan de
+      masse. Dedans : deux cœurs <b>Cortex-M33 à 150 MHz</b>, de la mémoire vive, et
+      <b>4 Mo de flash empilés dans le même boîtier</b> — c'est précisément ce qui
+      distingue le RP2354B du RP2350B nu. Un QFN n'a <em>aucune patte visible</em> :
+      les contacts sont sous le corps, la brasure se fait à l'aveugle et se contrôle
+      aux rayons X. Autour de lui, une trentaine de composants minuscules. Chaque broche
+      d'alimentation reçoit son <b>condensateur de découplage</b> à moins de deux
+      millimètres, parce qu'un cœur qui passe de 5 à 300 mA en une nanoseconde vide la
+      piste avant que le régulateur ait le temps de réagir : le condensateur est le
+      réservoir local qui tient pendant ces quelques nanosecondes. Retournez la carte —
+      une colonne entière de 0201 est montée <em>au dos, sous le boîtier</em>, reliée
+      par des vias traversants. C'est le chemin le plus court qui existe.`,
+    tags:['CALCUL','2 FACES'],
+    labels:[['U2','RP2354B · QFN-80']],
+    refs:'U2 + 31 passifs · C1…C17 R1…R30 Q1 Q2'
+  },
+  {
+    group:'coresmps', icon:'◎',
+    title:"Une bobine rien que pour le cœur",
+    what:"L'alimentation interne du RP2350",
+    html:`Détail que peu de cartes rendent visible : le RP2350 embarque <b>son propre
+      convertisseur à découpage</b> pour alimenter son cœur en 1,1 V, et ce convertisseur
+      a besoin d'une <b>bobine externe</b>. C'est <b>L1</b> — 3,3 µH dans un boîtier 2016
+      (2,0 × 1,6 mm), posée à trois millimètres du microcontrôleur, avec <b>C19</b> et
+      <b>C20</b> pour l'entrée et la sortie. La contrainte est celle de tout hacheur :
+      la <em>boucle de commutation</em> formée par la bobine, le condensateur et les
+      broches du circuit doit être la plus petite possible. Chaque millimètre carré de
+      surface qu'elle enferme est une antenne — et cette antenne rayonnerait à quelques
+      centimètres du gyroscope et du récepteur radio. Ici la boucle fait moins de cinq
+      millimètres de tour.`,
+    tags:['CALCUL','FACE AVANT'],
+    labels:[['L1','SMPS CŒUR · 3,3 µH']],
+    refs:'L1 · C9 C19 C20 · R10 R11'
+  },
+  {
+    group:'clock', icon:'◈',
+    title:"Un caillou qui vibre",
+    what:"Le quartz — la référence de temps",
+    html:`<b>X1</b> est un quartz quatre plots de 2,5 × 2,0 mm. À l'intérieur, une lamelle
+      de quartz taillée qui <b>vibre mécaniquement</b> dès qu'on lui applique une tension —
+      l'effet piézoélectrique — à une fréquence fixée par sa découpe, ici <b>12 MHz</b>,
+      stable à quelques dizaines de parties par million. La <b>PLL</b> du microcontrôleur
+      multiplie ensuite ce 12 MHz pour fabriquer les 150 MHz du cœur et l'horloge USB.
+      Sans lui, pas d'USB du tout : le protocole tolère <b>±0,25 %</b> d'écart, très en
+      dessous de ce que peut tenir un oscillateur RC interne. Regardez où il est monté :
+      <em>au dos, exactement sous le microcontrôleur</em>. Ce n'est pas de la place
+      perdue, c'est le trajet le plus court possible entre la lamelle et ses deux broches —
+      quelques millimètres de piste et deux vias. Un signal d'horloge qui traverse la
+      carte ramasse du bruit et en rayonne ; on le garde donc court, et entouré de masse.`,
+    tags:['HORLOGE','FACE ARRIÈRE'],
+    labels:[['X1','QUARTZ 12 MHz']],
+    refs:'X1 · C8 C11 C18'
+  },
+  {
+    group:'imu', icon:'◉',
+    title:"Six axes dans trois millimètres",
+    what:"La centrale inertielle BMI270 — l'oreille interne",
+    html:`<b>U9</b>, boîtier <b>LGA-14 de 3,0 × 2,5 mm</b>, est le seul composant sans
+      lequel un drone ne peut pas voler. Il contient deux capteurs <b>MEMS</b> gravés
+      dans le silicium. Le <b>gyromètre</b> : des masses microscopiques entretenues en
+      vibration, dont on mesure la déviation provoquée par la <em>force de Coriolis</em>
+      dès que la carte tourne — c'est la vitesse de rotation, sur trois axes, plusieurs
+      milliers de fois par seconde. L'<b>accéléromètre</b> : trois masses suspendues sur
+      des ressorts de silicium, dont on lit le déplacement comme une variation de
+      capacité. Le gyromètre est rapide mais il <em>dérive</em> ; l'accéléromètre est
+      bruyant mais il sait où est le bas. La fusion des deux donne une attitude à la fois
+      rapide et stable. C'est la mesure du gyromètre que la boucle PID compare à la
+      position de vos manches, à chaque cycle. Deux règles de montage : le placer
+      <b>près du centre de la carte</b>, pour qu'il lise la rotation et non les
+      accélérations centrifuges, et lui donner <b>son propre régulateur</b> — c'est
+      U15, à un millimètre de là.`,
+    tags:['CAPTEUR','FACE AVANT'],
+    labels:[['U9','BMI270 · LGA-14']],
+    refs:'U9 · C33 C34 · SPI vers U2'
+  },
+  {
+    group:'boot', icon:'⏻',
+    title:"Le bouton qui transforme la carte en clé USB",
+    what:"Le contact BOOTSEL",
+    html:`<b>U1</b> est un simple contact fugitif à quatre broches, 3 × 2 mm. Sa fonction
+      tient en une phrase : forcer l'état d'une broche <em>au moment précis où le
+      microcontrôleur démarre</em>. Le RP2350 lit cette broche à la mise sous tension ;
+      si elle est au bon niveau, il <b>n'exécute pas le programme</b> en flash et démarre
+      à la place sa ROM interne. La carte apparaît alors sur l'ordinateur comme une
+      <b>clé USB</b> : on y glisse un fichier <b>.uf2</b> et le firmware est écrit.
+      C'est le filet de sécurité du projet. Quel que soit l'état du logiciel embarqué —
+      même complètement corrompu, même bloqué au premier cycle — un firmware se répare
+      avec un bouton et un glisser-déposer, sans programmateur, sans souder un seul fil.`,
+    tags:['MISE EN ŒUVRE','FACE AVANT'],
+    labels:[['U1','BOUTON BOOT']],
+    refs:'U1 · C21 R9'
+  },
+  {
+    group:'status', icon:'✳',
+    title:"Cinq LED, cinq réponses",
+    what:"Les témoins d'état",
+    html:`Cinq LED en boîtier <b>0402</b> — un millimètre sur un demi. Chacune est en
+      série avec sa <b>résistance de limitation</b>, et c'est la seule façon correcte
+      de câbler une LED : une diode a une tension de seuil quasi fixe, si vous la
+      branchez directement sur un rail c'est le <em>courant</em> qui s'emballe et la
+      détruit. La résistance impose ce courant. Les paires sont visibles à l'œil dans
+      le modèle : <b>D9/R39</b>, <b>D1/R16</b>, <b>D7/R28</b>, alignées en colonne à
+      côté du microcontrôleur. Les deux autres, <b>D4</b> et <b>D5</b>, sont dans les
+      coins, chacune en face d'un convertisseur — ce sont les témoins de rail.
+      Sur une carte finie, ces cinq points lumineux sont le premier outil de
+      diagnostic : ils disent en une seconde si l'alimentation monte, si le firmware
+      tourne, et si la liaison est établie — avant même de brancher un ordinateur.`,
+    tags:['DIAGNOSTIC','FACE AVANT'],
+    labels:[['D1','LED + RÉSISTANCE']],
+    refs:'D1 D7 D9 · R16 R28 R39 · C10'
+  },
+  {
+    group:'sense', icon:'∿',
+    title:"Le coin discret",
+    what:"L'étage analogique — mesure et protection",
+    html:`Dans l'angle arrière droit, un groupe compact et facile à manquer : <b>U11</b>
+      (SOT-23-5), <b>U10</b> (X2SON-6, 1,0 × 0,8 mm), <b>U12</b> (X2SON-4, 0,8 × 0,8 mm),
+      la diode <b>D8</b>, et une dizaine de résistances 0201 dont deux séries de trois
+      parfaitement alignées. Ces alignements sont signés : trois résistances en file,
+      c'est la géométrie d'un <b>pont diviseur</b>. Le principe est élémentaire et
+      omniprésent — deux résistances en série entre la tension à mesurer et la masse,
+      et le point milieu, qui délivre une fraction fixe de cette tension, part vers un
+      <b>convertisseur analogique-numérique</b> du microcontrôleur. C'est exactement
+      comme ça qu'un OSD affiche « 15,8 V » : il ne mesure pas la batterie, il mesure
+      un dixième de la batterie et multiplie par dix.
+      <br><br><i style="color:#7fa8c4">Sur ce qui est certain : le modèle exporté donne
+      le boîtier, le repère et la position — pas la référence du silicium. Le rôle
+      analogique de service se lit dans la géométrie ; le numéro de pièce, non.</i>`,
+    tags:['ANALOGIQUE','FACE ARRIÈRE'],
+    labels:[['U11','SOT-23-5'],['U10','X2SON-6']],
+    refs:'U10 U11 U12 D8 · R31…R35 · C36…C40'
+  },
+  {
+    group:'usb', icon:'⇄',
+    title:"Seize contacts et deux résistances",
+    what:"Le port USB-C",
+    html:`<b>USB1</b> est une prise <b>USB-C 16 contacts</b> soudée en bord de carte —
+      le composant le plus haut du montage, 3,9 mm. Deux détails valent le détour.
+      D'abord la <b>réversibilité</b> : la prise est symétrique, donc chaque fonction
+      existe en double, et la carte doit <em>découvrir dans quel sens</em> le câble est
+      branché. C'est le rôle des broches <b>CC1</b> et <b>CC2</b>, et de <b>R3</b> et
+      <b>R4</b> — deux résistances de <b>5,1 kΩ vers la masse</b>, posées à trois
+      millimètres de la prise. Ces deux résistances font trois choses à la fois : elles
+      annoncent « je suis un périphérique », elles indiquent à la source combien de
+      courant elle peut fournir, et elles révèlent quelle paire de données est active.
+      Sans elles, un chargeur USB-C moderne ne délivre <em>strictement rien</em> —
+      c'est la panne classique des premières cartes maison. Ensuite le <b>blindage</b> :
+      le corps métallique est ancré par des pattes traversantes, à la fois pour la tenue
+      mécanique — c'est le connecteur qu'on arrache — et pour écouler les décharges
+      électrostatiques vers la masse plutôt que vers le microcontrôleur.`,
+    tags:['E/S','FACE ARRIÈRE'],
+    labels:[['USB1','USB-C 16P'],['R3','CC · 5,1 kΩ']],
+    refs:'USB1 · R3 R4 (CC1/CC2) · R36 R37 R38'
+  },
+  {
+    group:'sd', icon:'▤',
+    title:"La boîte noire",
+    what:"Le lecteur microSD — l'enregistreur de vol",
+    html:`<b>Card1</b> est de très loin le plus gros composant de la carte :
+      <b>15 × 16 mm</b>, près d'un sixième de la surface totale. C'est un support
+      microSD <b>push-push</b> — on pousse pour insérer, on repousse pour éjecter ;
+      à l'intérieur, un ressort et une <em>came en cœur</em>, le même mécanisme que
+      dans un stylo rétractable. Sa fonction est l'équivalent, pour un drone, de la
+      boîte noire d'un avion : pendant le vol, le microcontrôleur y écrit des dizaines
+      de fois par seconde la consigne de chaque manche, les trois axes du gyroscope,
+      la sortie de chaque terme du PID et la commande envoyée à chaque moteur.
+      Après le vol, ces courbes se superposent — et c'est le seul moyen sérieux de
+      comprendre <b>pourquoi</b> un drone oscille, plutôt que de tourner les réglages
+      au hasard. La contrainte de montage est d'abord mécanique : le blindage doit
+      être brasé sur de larges plages de cuivre, parce que chaque insertion de carte
+      pousse sur le connecteur et travaille les soudures.`,
+    tags:['ENREGISTREMENT','FACE ARRIÈRE'],
+    labels:[['Card1','LECTEUR microSD']],
+    refs:'Card1 · TF-SMD push-push · 15,2 × 16,2 × 2,7 mm'
+  },
+  {
+    group:'ports', icon:'⌸',
+    title:"Cinq peignes au pas d'un millimètre",
+    what:"La connectique et sa protection",
+    html:`Cinq connecteurs de la même famille — <b>pas de 1,00 mm</b>, contacts sur le
+      bord — mais de tailles différentes, et la taille trahit la fonction.
+      <b>P1</b>, <b>8 contacts</b> sur 10 mm, est le plus large : le format d'un
+      faisceau moteurs, quatre signaux plus la télémétrie, la masse et l'alimentation.
+      <b>U14</b> et <b>U8</b>, <b>6 contacts</b>, sont des ports mixtes liaison série
+      + alimentation. <b>CN1</b> (<b>4 contacts</b>) et <b>U13</b> (<b>3 contacts</b>)
+      sont les liaisons courtes : récepteur, vidéo, GPS.
+      Un point à comprendre avant de câbler : <em>il n'y a ni radio ni puce OSD sur
+      cette carte</em>. Le récepteur ExpressLRS et l'émetteur vidéo sont
+      <b>extérieurs</b> et se branchent ici. À côté, <b>U5</b>, <b>D2</b> et <b>D3</b>
+      protègent ces lignes : toute broche qui sort de la carte est une porte d'entrée
+      pour une décharge électrostatique, et ces diodes écoulent l'impulsion vers la
+      masse avant qu'elle n'atteigne le microcontrôleur.`,
+    tags:['E/S','FACE ARRIÈRE'],
+    labels:[['P1','8 CONTACTS'],['U14','6 CONTACTS'],['U13','3 CONTACTS'],['CN1','4 CONTACTS']],
+    refs:'P1 (8P) · U14 U8 (6P) · CN1 (4P) · U13 (3P) · U5 D2 D3'
+  },
+  {
+    group:'*', icon:'✓',
+    title:"111 composants, deux faces",
+    what:"Assemblage terminé",
+    html:`La carte complète compte <b>111 composants placés</b> : un microcontrôleur,
+      une centrale inertielle, un quartz, dix circuits de service, trois bobines,
+      cinq LED, six connecteurs et quatre-vingt-quatre résistances et condensateurs —
+      <b>39 sur la face avant, 72 sur la face arrière</b>.
+      <br><br><b>Comment c'est vraiment fabriqué.</b> Ce guide avance une fonction à la
+      fois, parce que c'est comme ça qu'on comprend une carte. En production, l'ordre
+      est tout autre : <em>la face compte davantage que la fonction</em>. On imprime la
+      crème à braser au pochoir sur une face, une machine pose <b>tous</b> ses composants
+      en une passe à plus de dix par seconde, la carte traverse un four à refusion et
+      l'ensemble des soudures se fait <em>en une seule montée en température</em>.
+      Puis on retourne la carte et on recommence. Les 0201 mesurent 0,6 × 0,3 mm : rien
+      de tout cela ne se soude à la main.
+      <br><br><b>Ce qui n'est pas sur cette carte.</b> Pas de puce OSD dédiée, pas de
+      récepteur radio intégré, pas de baromètre, pas de capteur de courant. L'incrustation
+      vidéo se fait en logiciel dans le microcontrôleur ; la radio et la vidéo se
+      branchent sur les ports JST.`,
+    tags:['TERMINÉ','2 FACES'],
+    refs:'111 composants · 288 solides · 39 avant / 72 arrière'
+  }
+];
 
-    scene.add(new THREE.HemisphereLight(0xdcefff, 0x2f3f52, 0.65));
-    scene.add(new THREE.AmbientLight(0xffffff, 0.4));
+/* ========================================================================== */
+const $ = id => document.getElementById(id);
 
-    scene.add(camera);
-    const headLight = new THREE.DirectionalLight(0xfff4e2, 1.2);
-    headLight.position.set(0, 0, 1);
-    camera.add(headLight);
+const renderer = new THREE.WebGLRenderer({ antialias:true });
+renderer.setPixelRatio(Math.min(2, devicePixelRatio));
+renderer.setSize(innerWidth, innerHeight);
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 1.15;
+$('viewport').appendChild(renderer.domElement);
 
-    const pmremGenerator = new THREE.PMREMGenerator(renderer);
-    scene.environment = pmremGenerator.fromScene(new RoomEnvironment(), 0.04).texture;
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0x0b1622);
 
-    const ROOT = new THREE.Group(); 
-    scene.add(ROOT);    
+const camera = new THREE.PerspectiveCamera(38, innerWidth/innerHeight, 0.05, 200);
+const controls = new OrbitControls(camera, renderer.domElement);
+controls.enableDamping = true;
+controls.dampingFactor = 0.075;
+controls.minDistance = 0.6;
+controls.maxDistance = 6;
+controls.autoRotateSpeed = 1.1;
 
-    let partsRoot = null;
-    let allMeshes = [];
-    let stepIndex = 0, flipped = false;
+scene.add(new THREE.HemisphereLight(0xd8ecff, 0x1b2b3a, 0.55));
+const key = new THREE.DirectionalLight(0xfff2e2, 1.5);
+key.position.set(2.2, 3.2, 2.6);
+scene.add(key);
+const fill = new THREE.DirectionalLight(0x9fd8ff, 0.55);
+fill.position.set(-2.6, -1.4, 1.6);
+scene.add(fill);
+scene.add(camera);
+const rim = new THREE.DirectionalLight(0xffffff, 0.42);
+rim.position.set(0, 0, 1);
+camera.add(rim);
 
-    async function load() {
-      const loader = new GLTFLoader().setMeshoptDecoder(MeshoptDecoder);
-      try {
-        const [bRes, pRes] = await Promise.all([
-          loader.loadAsync(`${ASSETS}/fc-board.glb`),
-          loader.loadAsync(`${ASSETS}/fc-parts.glb`)
-        ]);
-                
-        ROOT.add(bRes.scene);
-        partsRoot = pRes.scene;
-        ROOT.add(partsRoot);
+const pmrem = new THREE.PMREMGenerator(renderer);
+scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
 
-        // Collecte robuste de tous les meshes enfants (même profondément imbriqués)
-        allMeshes = [];
-        partsRoot.traverse(o => {
-          if (o.isMesh) {
-            allMeshes.push(o);
-            o.visible = true; // FORCE L'AFFICHAGE DE TOUTES LES PIÈCES
-            if (o.material) {
-              o.material.side = THREE.DoubleSide; // Évite les faces cachées transparentes
-            }
-          }
-        });
+/* PIVOT tourne autour du centre géométrique de la carte ; MODEL porte le
+   recentrage et la mise à l'échelle. Séparer les deux est ce qui permet au
+   « Retourner » de faire tourner la carte sur elle-même au lieu de l'envoyer
+   hors du champ. */
+const PIVOT = new THREE.Group();
+const MODEL = new THREE.Group();
+PIVOT.add(MODEL);
+scene.add(PIVOT);
 
-        console.log(`Modèles chargés avec succès. ${allMeshes.length} pièces détectées.`);
+const OUTLINES = new THREE.Group();
+OUTLINES.renderOrder = 999;
+PIVOT.add(OUTLINES);
 
-        // Centrage automatique du modèle global
-        const box = new THREE.Box3().setFromObject(ROOT);
-        const centre = box.getCenter(new THREE.Vector3());
-        const size = box.getSize(new THREE.Vector3());
-        const maxDim = Math.max(size.x, size.y, size.z);
+let partsMap = null;        // parts-map.json
+let byRef = new Map();      // refdes  -> composant
+let meshOf = new Map();     // nom glTF -> mesh
+let boardMesh = null;
+let stepIndex = 0;
+let flipped = false;        // true = on regarde la face arrière
+let xray = false;
+let boardMM = { centre:new THREE.Vector3(), size:new THREE.Vector3(), scale:1 };
 
-        ROOT.position.sub(centre); 
-        controls.target.set(0, 0, 0);
-        camera.position.set(0, maxDim * 1.0, maxDim * 2.5);
-        controls.update();
+const ACCENT = new THREE.Color(0xff7a66);
+const GHOST  = new THREE.Color(0x5d7488);
 
-        showStep(0);
-      } catch (err) {
-        console.error("Erreur lors du chargement des modèles 3D :", err);
-        document.getElementById('cTitle').textContent = "Erreur de chargement";
-        document.getElementById('cBlurb').textContent = "Vérifiez la console et le chemin des fichiers GLB.";
-      }
-    }  
+/* La fiche occupe le bord gauche (ou le bas sur petit écran) : on décale la
+   projection pour que la carte reste centrée dans l'espace qui reste. */
+function applyViewOffset(){
+  const w = innerWidth, h = innerHeight;
+  const wide = w >= 900;
+  camera.setViewOffset(w, h, wide ? -Math.min(215, (w-720)/2) : 0, wide ? 0 : 74, w, h);
+}
 
-    function showStep(idx) {
-      stepIndex = idx;
-      const s = STEPS[idx];
-      document.getElementById('pCount').textContent = `${idx + 1}/8`;
-      document.getElementById('barFill').style.width = `${((idx+1)/8)*100}%`;
-      document.getElementById('cTitle').textContent = s.title;
-      document.getElementById('cWhat').textContent = s.what;
-      document.getElementById('cBlurb').textContent = s.blurb;
-            
-      if (allMeshes.length > 0) {
-        if (idx === 7) {
-          allMeshes.forEach(m => m.visible = true);
-        } else {
-          const chunkCount = Math.ceil(allMeshes.length / 7);
-          const visibleLimit = (idx + 1) * chunkCount;
-          allMeshes.forEach((m, i) => {
-            m.visible = (i < visibleLimit);
-          });
-        }
-      }
+/* ---------- matériaux : le GLB sort de KiCad en couleurs plates ---------- */
+function dressMaterial(mesh, isBoard){
+  const m = mesh.material;
+  m.side = THREE.FrontSide;
+  m.envMapIntensity = 1.15;
 
-      document.getElementById('btnBack').disabled = (idx === 0);
-      document.getElementById('btnNext').textContent = (idx === 7) ? 'Finish 🏆' : 'Next →';
+  if (isBoard){
+    // le stratifié est mat ; les normales lissées de KiCad font onduler une
+    // surface pourtant parfaitement plane, d'où le rendu à facettes
+    m.color.setHex(0x0f3b2b);
+    m.roughness = 0.62; m.metalness = 0.03;
+    m.flatShading = true;
+  } else {
+    const c = m.color;
+    const grey = c.r > 0.5 && Math.abs(c.r-c.g) < 0.05 && Math.abs(c.g-c.b) < 0.05;
+    const dark = c.r + c.g + c.b < 0.35;
+    if (grey){
+      // boîtiers métalliques : blindages, cages, contacts, noyaux de bobine
+      m.color.setHex(0xcdd6dc); m.metalness = 0.88; m.roughness = 0.33;
+    } else if (dark){
+      // résine époxy des boîtiers : le noir pur lit comme un trou
+      m.color.setHex(0x23262b); m.metalness = 0.05; m.roughness = 0.52;
+    } else {
+      m.metalness = 0.08; m.roughness = 0.55;
+      m.color.multiplyScalar(1.35);
     }
+  }
+  mesh.userData.base = {
+    color: m.color.clone(),
+    roughness: m.roughness,
+    metalness: m.metalness,
+    opacity: 1
+  };
+}
 
-    document.getElementById('btnNext').onclick = () => { 
-       if(stepIndex < 7) showStep(++stepIndex);
-       else location.reload(); 
-    };
+function setState(mesh, state){
+  const m = mesh.material, b = mesh.userData.base;
+  mesh.visible = state !== 'hidden';
+  if (state === 'hidden') return;
 
-    document.getElementById('btnBack').onclick = () => { 
-       if(stepIndex > 0) showStep(--stepIndex);
-    };
+  m.transparent = (state === 'ghost');
+  m.depthWrite  = (state !== 'ghost');
+  m.opacity     = (state === 'ghost') ? 0.26 : 1;
+  m.color.copy(b.color);
+  m.roughness = b.roughness;
+  m.metalness = b.metalness;
 
-    document.getElementById('btnFlip').onclick = () => { 
-       flipped = !flipped;
-       gsap.to(ROOT.rotation, {x: flipped ? Math.PI : 0, duration: 1, ease: "back.out(1.2)"});
-    };
+  if (state === 'active'){
+    m.color.lerp(ACCENT, 0.88);
+    m.emissive.setHex(0x7a2615);
+    m.metalness = Math.min(b.metalness, 0.22);
+    m.roughness = 0.38;
+  } else {
+    m.emissive.setHex(0x000000);
+    if (state === 'ghost'){
+      // désaturer : un fantôme coloré se confond avec la pièce en cours
+      m.color.lerp(GHOST, 0.7);
+      m.metalness = 0.1; m.roughness = 0.7;
+    }
+  }
+  m.needsUpdate = true;
+}
 
-    document.getElementById('chkSpin').onchange = (e) => controls.autoRotate = e.target.checked;
+function setBoardState(ghost){
+  if (!boardMesh) return;
+  const m = boardMesh.material;
+  m.transparent = ghost;
+  m.depthWrite  = !ghost;
+  m.opacity     = ghost ? 0.5 : 1;
+  // translucide et sombre sur fond sombre, le PCB disparaît : on l'éclaircit
+  // pour qu'il continue de situer les composants
+  m.color.setHex(ghost ? 0x2a7d5e : 0x0f3b2b);
+  m.needsUpdate = true;
+}
 
-    document.getElementById('btnReframe').onclick = () => { 
-       gsap.to(ROOT.rotation, {x: 0, y: 0, z: 0, duration: 0.5});
-      const box = new THREE.Box3().setFromObject(ROOT);
-      const size = box.getSize(new THREE.Vector3());
-      const maxDim = Math.max(size.x, size.y, size.z);
+/* ---------- chargement ---------- */
+async function load(){
+  const loader = new GLTFLoader().setMeshoptDecoder(MeshoptDecoder);
+  const [board, parts, map] = await Promise.all([
+    loader.loadAsync(`${ASSETS}/fc-board.glb`),
+    loader.loadAsync(`${ASSETS}/fc-parts.glb`),
+    fetch(`${ASSETS}/parts-map.json`).then(r => {
+      if (!r.ok) throw new Error(`parts-map.json : ${r.status}`);
+      return r.json();
+    })
+  ]);
 
-      controls.target.set(0, 0, 0); 
-      gsap.to(camera.position, {
-        x: 0, 
-        y: maxDim * 1.0, 
-        z: maxDim * 2.5, 
-        duration: 0.8,
-        onUpdate: () => controls.update()
-      });
-    };
+  partsMap = map;
+  for (const c of map.components) byRef.set(c.ref, c);
 
-    window.addEventListener('resize', () => {
-      camera.aspect = innerWidth / innerHeight;
-      camera.updateProjectionMatrix();
-      renderer.setSize(innerWidth, innerHeight);
-    });
+  MODEL.add(board.scene, parts.scene);
+  board.scene.traverse(o => { if (o.isMesh){ boardMesh = o; dressMaterial(o, true); } });
+  parts.scene.traverse(o => { if (o.isMesh){ meshOf.set(o.name, o); dressMaterial(o, false); } });
 
-    load();
+  // recentrer sur la carte nue, pas sur l'encombrement des connecteurs :
+  // le centre du PCB est le point autour duquel il est naturel de la retourner
+  const box = new THREE.Box3().setFromObject(board.scene);
+  const centre = box.getCenter(new THREE.Vector3());
+  const size = box.getSize(new THREE.Vector3());
+  const S = 1 / Math.max(size.x, size.y);
+  MODEL.scale.setScalar(S);
+  MODEL.position.copy(centre).multiplyScalar(-S);
+  boardMM = { centre, size, scale:S };
 
-    function animate() { 
-       requestAnimationFrame(animate);
-       controls.update();
-       renderer.render(scene, camera);
-    }    
-    animate();
-  </script>
+  const missing = map.components.filter(c => c.meshes.some(n => !meshOf.has(n)));
+  if (missing.length) console.warn('maillages absents du GLB :', missing.map(c => c.ref));
+
+  $('load').style.opacity = 0;
+  setTimeout(() => $('load').remove(), 500);
+  showStep(0, true);
+}
+
+/* ---------- passage d'un point du modèle (mm) au monde ---------- */
+const _v = new THREE.Vector3();
+function toWorld(xmm, ymm, zmm, flipY){
+  _v.set(xmm/1000, ymm/1000, zmm/1000)
+    .sub(boardMM.centre).multiplyScalar(boardMM.scale);
+  if (flipY) _v.set(-_v.x, _v.y, -_v.z);   // rotation de π autour de Y
+  return _v.clone();
+}
+function centreOf(c, flipY){
+  return toWorld((c.bb[0][0]+c.bb[1][0])/2, (c.bb[0][1]+c.bb[1][1])/2,
+                 (c.bb[0][2]+c.bb[1][2])/2, flipY);
+}
+
+/* ---------- contours du composant en cours ---------- */
+const outlineMat = new THREE.LineBasicMaterial({ color:0xff7a66, transparent:true, opacity:0.9, depthTest:false });
+function drawOutlines(comps){
+  OUTLINES.clear();
+  for (const c of comps){
+    const [lo, hi] = c.bb;
+    const g = new THREE.BoxGeometry(
+      Math.max(hi[0]-lo[0], 0.35)/1000, Math.max(hi[1]-lo[1], 0.35)/1000, Math.max(hi[2]-lo[2], 0.2)/1000);
+    const edges = new THREE.LineSegments(new THREE.EdgesGeometry(g), outlineMat);
+    const p = new THREE.Vector3((lo[0]+hi[0])/2/1000, (lo[1]+hi[1])/2/1000, (lo[2]+hi[2])/2/1000)
+      .sub(boardMM.centre).multiplyScalar(boardMM.scale);
+    edges.position.copy(p);
+    edges.scale.multiplyScalar(boardMM.scale * 1.14);
+    edges.renderOrder = 999;
+    OUTLINES.add(edges);
+  }
+}
+
+/* ---------- étiquettes ---------- */
+const labelEls = [];
+function buildLabels(step){
+  const host = $('labels'), svg = $('leaders');
+  labelEls.length = 0;
+  host.querySelectorAll('.lbl').forEach(e => e.remove());
+  svg.innerHTML = '';
+  for (const [ref, text] of (step.labels || [])){
+    const c = byRef.get(ref);
+    if (!c) continue;
+    const el = document.createElement('div');
+    el.className = 'lbl';
+    el.innerHTML = `${ref}<small>${text}</small>`;
+    host.appendChild(el);
+    const line = document.createElementNS('http://www.w3.org/2000/svg','path');
+    line.setAttribute('stroke', '#ff7a66');
+    line.setAttribute('stroke-width', '2');
+    line.setAttribute('fill', 'none');
+    line.setAttribute('stroke-linejoin', 'round');
+    svg.appendChild(line);
+    const dot = document.createElementNS('http://www.w3.org/2000/svg','circle');
+    dot.setAttribute('r', '3.5');
+    dot.setAttribute('fill', '#ff7a66');
+    svg.appendChild(dot);
+    labelEls.push({ el, line, dot, comp:c });
+  }
+  requestAnimationFrame(() => labelEls.forEach(l => l.el.style.opacity = 1));
+}
+
+const _p = new THREE.Vector3();
+function positionLabels(){
+  if (!labelEls.length) return;
+  const w = innerWidth, h = innerHeight;
+  const top = 146, bottom = h - 118;     // sous le bandeau, au-dessus des boutons
+  const hubX = w/2 + (w >= 900 ? 215 : 0);
+  const hubY = h/2 - (w >= 900 ? 0 : 74);
+
+  // projeter d'abord toutes les pièces…
+  const shots = labelEls.map(l => {
+    const [lo, hi] = l.comp.bb;
+    _p.set((lo[0]+hi[0])/2/1000, (lo[1]+hi[1])/2/1000, (lo[2]+hi[2])/2/1000);
+    MODEL.localToWorld(_p).project(camera);
+    return { l, sx:(_p.x*0.5+0.5)*w, sy:(-_p.y*0.5+0.5)*h, behind:_p.z > 1 };
+  });
+  // …puis les poser de haut en bas : l'ordre vertical des étiquettes suit celui
+  // des pièces, ce qui empêche les lignes de repère de se croiser
+  shots.sort((a, b) => a.sy - b.sy);
+
+  const placed = [];
+  for (const s of shots){
+    const dx = s.sx - hubX, dy = s.sy - hubY;
+    const len = Math.hypot(dx, dy) || 1;
+    let lx = s.sx + dx/len * 150;
+    let ly = s.sy + dy/len * 108;
+    lx = Math.max(w >= 900 ? 470 : 80, Math.min(w-100, lx));
+    ly = Math.max(top, ly);
+    // posées de haut en bas, il suffit de repousser vers le bas
+    for (const q of placed){
+      if (Math.abs(lx-q.x) < 168 && ly < q.y + 44) ly = q.y + 44;
+    }
+    placed.push({ x:lx, y:ly });
+  }
+  // si la pile déborde, on remonte la colonne entière — mais jamais plus que la
+  // marge disponible en haut, sinon le décalage rabat les étiquettes l'une sur
+  // l'autre au lieu de les espacer
+  const overflow = Math.max(...placed.map(q => q.y)) - bottom;
+  const headroom = Math.min(...placed.map(q => q.y)) - top;
+  const shift = Math.min(Math.max(overflow, 0), Math.max(headroom, 0));
+  if (shift) for (const q of placed) q.y -= shift;
+
+  shots.forEach((s, i) => {
+    const { x:lx, y:ly } = placed[i];
+    const shown = s.behind ? 0 : 1;
+    s.l.el.style.left = lx+'px';
+    s.l.el.style.top  = ly+'px';
+    s.l.el.style.opacity = shown;
+    s.l.line.setAttribute('opacity', shown * 0.85);
+    s.l.dot.setAttribute('opacity', shown);
+    s.l.dot.setAttribute('cx', s.sx);
+    s.l.dot.setAttribute('cy', s.sy);
+    // coude horizontal puis segment vers la pièce : plus lisible qu'une droite
+    const elbow = lx + (s.sx > lx ? 34 : -34);
+    s.l.line.setAttribute('d', `M ${lx} ${ly} L ${elbow} ${ly} L ${s.sx} ${s.sy}`);
+  });
+}
+
+/* ---------- navigation ---------- */
+function componentsFor(step){
+  if (!partsMap) return [];
+  if (step.group === '*') return partsMap.components;
+  if (!step.group) return [];
+  return partsMap.components.filter(c => c.step === step.group);
+}
+function installedBefore(idx){
+  const done = new Set();
+  for (let i = 0; i < idx; i++){
+    const g = STEPS[i].group;
+    if (!g) continue;
+    if (g === '*'){ partsMap.components.forEach(c => done.add(c.ref)); continue; }
+    componentsFor(STEPS[i]).forEach(c => done.add(c.ref));
+  }
+  return done;
+}
+
+function showStep(idx, instant){
+  stepIndex = idx;
+  const s = STEPS[idx];
+  // l'étape finale n'installe rien : elle montre la carte telle qu'elle sort
+  // du four, en matériaux normaux — tout surligner n'apprendrait rien
+  const finale = s.group === '*';
+  const active = finale ? [] : componentsFor(s);
+  const done = finale ? new Set(partsMap.components.map(c => c.ref)) : installedBefore(idx);
+  const activeRefs = new Set(active.map(c => c.ref));
+
+  // fiche
+  $('pCount').textContent = `${idx+1}/${STEPS.length}`;
+  $('barFill').style.width = `${((idx+1)/STEPS.length)*100}%`;
+  $('cIcon').textContent = s.icon;
+  $('cTitle').textContent = s.title;
+  $('cWhat').textContent = s.what;
+  $('cBlurb').innerHTML = s.html;
+  $('cTags').innerHTML = (s.tags||[])
+    .map(t => `<span class="tag${/FACE/.test(t) ? ' face' : ''}">${t}</span>`).join('');
+  $('cRefs').innerHTML = s.refs ? `<i>sur la carte :</i> ${s.refs}` : '';
+  $('card').scrollTop = 0;
+
+  // état de chaque maillage
+  for (const c of partsMap.components){
+    const state = activeRefs.has(c.ref) ? 'active'
+                : done.has(c.ref)       ? 'installed'
+                : 'hidden';
+    for (const name of c.meshes){
+      const mesh = meshOf.get(name);
+      if (mesh) setState(mesh, state);
+    }
+  }
+
+  // quelle face regarder ?
+  const back = active.filter(c => c.back).length;
+  const front = active.length - back;
+  // « deux faces » seulement si la répartition est réelle : deux LED témoins en
+  // face d'un étage de puissance ne justifient pas de rendre le PCB translucide
+  const bothFaces = !finale && active.length > 0 &&
+                    Math.min(front, back) / active.length >= 0.25;
+  const wantFlip = active.length ? (back > front) : flipped;
+
+  if (xray || bothFaces){
+    setBoardState(true);
+    for (const c of partsMap.components){
+      if (activeRefs.has(c.ref) || !done.has(c.ref)) continue;
+      for (const name of c.meshes){
+        const mesh = meshOf.get(name);
+        if (mesh) setState(mesh, 'ghost');
+      }
+    }
+  } else {
+    setBoardState(false);
+  }
+
+  $('face').textContent = finale ? 'CARTE TERMINÉE — 111 COMPOSANTS'
+    : !s.group ? 'CARTE NUE — AVANT ASSEMBLAGE'
+    : bothFaces ? 'LES DEUX FACES — utilisez « Retourner »'
+    : wantFlip ? 'FACE ARRIÈRE — connectique' : 'FACE AVANT — calcul';
+
+  drawOutlines(active.filter(c => c.meshes.length && (c.bb[1][0]-c.bb[0][0]) > 0));
+  buildLabels(s);
+
+  if (wantFlip !== flipped) setFlip(wantFlip, instant);
+  frameOn(active, wantFlip, instant);
+
+  $('btnBack').disabled = (idx === 0);
+  $('btnNext').textContent = (idx === STEPS.length-1) ? '↺ Recommencer' : 'Suivant →';
+}
+
+/* Retourner la carte sur elle-même : rotation de π autour de l'axe vertical
+   du PIVOT, qui est déjà au centre géométrique du PCB. */
+function setFlip(next, instant){
+  flipped = next;
+  const to = flipped ? Math.PI : 0;
+  if (instant) PIVOT.rotation.y = to;
+  else gsap.to(PIVOT.rotation, { y:to, duration:0.95, ease:'power3.inOut' });
+}
+
+/* On ne resserre jamais au point de perdre la carte : savoir *où* se trouve
+   un composant compte autant que le voir. Le cadrage garde donc toujours la
+   quasi-totalité du PCB dans le champ et se contente de glisser vers la zone
+   active — c'est le surlignage et l'étiquette qui désignent la pièce. */
+function frameOn(comps, willFlip, instant){
+  const centre = new THREE.Vector3();
+  let spread = 1;
+  if (comps.length && comps.length < partsMap.components.length){
+    const lo = [ Infinity, Infinity, Infinity], hi = [-Infinity,-Infinity,-Infinity];
+    for (const c of comps) for (let a=0;a<3;a++){
+      lo[a] = Math.min(lo[a], c.bb[0][a]); hi[a] = Math.max(hi[a], c.bb[1][a]);
+    }
+    centre.copy(toWorld((lo[0]+hi[0])/2, (lo[1]+hi[1])/2, (lo[2]+hi[2])/2, willFlip));
+    centre.multiplyScalar(0.30);           // glisser vers la zone, pas dessus
+    spread = Math.max(hi[0]-lo[0], hi[1]-lo[1]) / 1000 * boardMM.scale;
+  }
+  // le bandeau et les boutons mangent ~20 % de la hauteur : la carte doit tenir
+  // dans ce qui reste, sinon elle sort du cadre en haut et à droite
+  const fit = THREE.MathUtils.lerp(1.80, 2.06, THREE.MathUtils.clamp(spread, 0, 1));
+  const dist = THREE.MathUtils.clamp(fit, 1.80, 2.06);
+  const dir = new THREE.Vector3(0.26, 0.46, 1).normalize();
+  const pos = centre.clone().add(dir.multiplyScalar(dist));
+
+  if (instant){
+    camera.position.copy(pos); controls.target.copy(centre); controls.update(); return;
+  }
+  gsap.to(camera.position, { x:pos.x, y:pos.y, z:pos.z, duration:0.95, ease:'power3.inOut' });
+  gsap.to(controls.target, { x:centre.x, y:centre.y, z:centre.z, duration:0.95, ease:'power3.inOut',
+    onUpdate:() => controls.update() });
+}
+
+/* ---------- interactions ---------- */
+$('btnNext').onclick = () => showStep(stepIndex < STEPS.length-1 ? stepIndex+1 : 0);
+$('btnBack').onclick = () => { if (stepIndex > 0) showStep(stepIndex-1); };
+$('btnFlip').onclick = () => setFlip(!flipped);
+$('btnReframe').onclick = () => showStep(stepIndex);
+$('btnXray').onclick = e => {
+  xray = !xray;
+  e.currentTarget.classList.toggle('on', xray);
+  showStep(stepIndex, true);
+};
+$('btnSpin').onclick = e => {
+  controls.autoRotate = !controls.autoRotate;
+  e.currentTarget.classList.toggle('on', controls.autoRotate);
+};
+addEventListener('keydown', e => {
+  if (e.key === 'ArrowRight' || e.key === ' ') { e.preventDefault(); $('btnNext').click(); }
+  if (e.key === 'ArrowLeft')  $('btnBack').click();
+  if (e.key.toLowerCase() === 'f') $('btnFlip').click();
+});
+addEventListener('pointerdown', () => {
+  const h = $('hint');
+  if (h) { h.style.opacity = 0; setTimeout(() => h.remove(), 600); }
+}, { once:true });
+
+addEventListener('resize', () => {
+  camera.aspect = innerWidth/innerHeight;
+  applyViewOffset();
+  camera.updateProjectionMatrix();
+  renderer.setSize(innerWidth, innerHeight);
+});
+applyViewOffset();
+
+const clock = new THREE.Clock();
+function animate(){
+  requestAnimationFrame(animate);
+  controls.update();
+  outlineMat.opacity = 0.55 + 0.35*Math.sin(clock.getElapsedTime()*3.1);
+  positionLabels();
+  renderer.render(scene, camera);
+}
+animate();
+
+load().catch(err => {
+  console.error(err);
+  $('load').innerHTML = `<div style="text-align:center">
+    <b style="color:#ff7a66">Chargement impossible</b><br><br>
+    ${err.message}<br><br>
+    <span style="color:#6f96b1">Servez le dossier via HTTP (les fichiers GLB et JSON<br>
+    ne se chargent pas depuis file://).</span></div>`;
+});
+</script>
 </body>
 </html>
